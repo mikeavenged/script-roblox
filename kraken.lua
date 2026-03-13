@@ -69,38 +69,6 @@ local LocalPlayer = Players.LocalPlayer
 local Workspace = game:GetService("Workspace")
 local Camera = Workspace.CurrentCamera
 
-local function isHungry()
-    local hud = LocalPlayer.PlayerGui:FindFirstChild("HUDGui")
-    if not hud then return false end
-    
-    local bars = hud:FindFirstChild("Bars")
-    if not bars then return false end
-    
-    local hunger = bars:FindFirstChild("Hunger")
-    if hunger and hunger:FindFirstChild("Bar") then
-        local size = hunger.Bar.Size.X.Scale
-        return size < 0.6 -- ถ้าน้อยกว่า 60% ถือว่าหิว
-    end
-    
-    return false
-end
-
-local function isThirsty()
-    local hud = LocalPlayer.PlayerGui:FindFirstChild("HUDGui")
-    if not hud then return false end
-    
-    local bars = hud:FindFirstChild("Bars")
-    if not bars then return false end
-    
-    local thirst = bars:FindFirstChild("Thirst")
-    if thirst and thirst:FindFirstChild("Bar") then
-        local size = thirst.Bar.Size.X.Scale
-        return size < 0.9
-    end
-    
-    return false
-end
-
 local function pressKey(keyCode)
     VirtualInputManager:SendKeyEvent(true, keyCode, false, game)
     task.wait(0.25)
@@ -213,8 +181,7 @@ task.spawn(function()
             if currentTask == nil then
                 local taskPool = {}
                 if qMud and qMud.Visible then table.insert(taskPool, "Mud") end
-                if qDrink and qDrink.Visible and (isHungry() or isThirsty()) then table.insert(taskPool, "Drink")
-end
+                if qDrink and qDrink.Visible then table.insert(taskPool, "Drink") end
                 if qSniff and qSniff.Visible and tick() - lastSniffTime >= sniffCooldown then
     table.insert(taskPool, "Sniff")
 end
@@ -256,17 +223,17 @@ end
                     local target = getClosest(Workspace.Interactions.Lakes, "SurfaceMask")
                     if target then
                         if not hasTeleported then
-                            myRoot.CFrame = target.CFrame * CFrame.new(0, 1, 0)
+                            myRoot.CFrame = target.CFrame * CFrame.new(0, 2, 0)
                             hasTeleported = true
                         end
                         pressKey(Enum.KeyCode.E)
                     end
                 else
                     local target = getClosestPart(Workspace.Interactions.Food, "Ribs", "Food")
-                if target then
+                   if target then
     if not hasTeleported then
-        local offset = target.CFrame.LookVector * -4
-        local telePos = target.Position + offset + Vector3.new(0,3,0)
+        local randomOffset = Vector3.new(math.random(-6,6), 3, math.random(-6,6))
+        local telePos = target.Position + randomOffset
 
         myRoot.CFrame = CFrame.lookAt(telePos, target.Position)
         Camera.CFrame = CFrame.lookAt(Camera.CFrame.Position, target.Position)
