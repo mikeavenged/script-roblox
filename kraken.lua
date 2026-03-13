@@ -263,10 +263,10 @@ end
                     end
                 else
                     local target = getClosestPart(Workspace.Interactions.Food, "Ribs", "Food")
-                   if target then
+                if target then
     if not hasTeleported then
-        local randomOffset = Vector3.new(math.random(-6,6), 3, math.random(-6,6))
-        local telePos = target.Position + randomOffset
+        local offset = target.CFrame.LookVector * -4
+        local telePos = target.Position + offset + Vector3.new(0,3,0)
 
         myRoot.CFrame = CFrame.lookAt(telePos, target.Position)
         Camera.CFrame = CFrame.lookAt(Camera.CFrame.Position, target.Position)
