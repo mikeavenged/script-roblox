@@ -216,17 +216,13 @@ task.spawn(function()
                 end
                 if foodMode == "Water" then
                     local target = getClosest(Workspace.Interactions.Lakes, "SurfaceMask")
-if target then
-    if not hasTeleported then
-        local edgeOffset = target.CFrame.LookVector * -25
-        local pos = target.Position + edgeOffset + Vector3.new(0,5,0)
-
-        myRoot.CFrame = CFrame.lookAt(pos, target.Position)
-
-        hasTeleported = true
-    end
-    pressKey(Enum.KeyCode.E)
-end
+                    if target then
+                        if not hasTeleported then
+                            myRoot.CFrame = target.CFrame * CFrame.new(0, 40, 0)
+                            hasTeleported = true
+                        end
+                        pressKey(Enum.KeyCode.E)
+                    end
                 else
                     local target = getClosestPart(Workspace.Interactions.Food, "Ribs", "Food")
                    if target then
