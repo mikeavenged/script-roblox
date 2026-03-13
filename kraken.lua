@@ -69,6 +69,38 @@ local LocalPlayer = Players.LocalPlayer
 local Workspace = game:GetService("Workspace")
 local Camera = Workspace.CurrentCamera
 
+local function isHungry()
+    local hud = LocalPlayer.PlayerGui:FindFirstChild("HUDGui")
+    if not hud then return false end
+    
+    local bars = hud:FindFirstChild("Bars")
+    if not bars then return false end
+    
+    local hunger = bars:FindFirstChild("Hunger")
+    if hunger and hunger:FindFirstChild("Bar") then
+        local size = hunger.Bar.Size.X.Scale
+        return size < 0.6 -- ถ้าน้อยกว่า 60% ถือว่าหิว
+    end
+    
+    return false
+end
+
+local function isThirsty()
+    local hud = LocalPlayer.PlayerGui:FindFirstChild("HUDGui")
+    if not hud then return false end
+    
+    local bars = hud:FindFirstChild("Bars")
+    if not bars then return false end
+    
+    local thirst = bars:FindFirstChild("Thirst")
+    if thirst and thirst:FindFirstChild("Bar") then
+        local size = thirst.Bar.Size.X.Scale
+        return size < 0.6
+    end
+    
+    return false
+end
+
 local function pressKey(keyCode)
     VirtualInputManager:SendKeyEvent(true, keyCode, false, game)
     task.wait(0.25)
@@ -181,7 +213,8 @@ task.spawn(function()
             if currentTask == nil then
                 local taskPool = {}
                 if qMud and qMud.Visible then table.insert(taskPool, "Mud") end
-                if qDrink and qDrink.Visible then table.insert(taskPool, "Drink") end
+                if qDrink and qDrink.Visible and (isHungry() or isThirsty()) then table.insert(taskPool, "Drink")
+end
                 if qSniff and qSniff.Visible and tick() - lastSniffTime >= sniffCooldown then
     table.insert(taskPool, "Sniff")
 end
