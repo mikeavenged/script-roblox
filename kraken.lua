@@ -1,4 +1,5 @@
-print("script loaded")
+print("KRAKEN SCRIPT LOADED")
+warn("KRAKEN STARTED")
 local lakesFolder = workspace.Interactions.Lakes
 for _, object in pairs(lakesFolder:GetDescendants()) do
     if object:IsA("BasePart") then
