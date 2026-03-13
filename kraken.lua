@@ -224,18 +224,18 @@ task.spawn(function()
                         pressKey(Enum.KeyCode.E)
                     end
                 else
-                    local target = getClosestPart(Workspace.Interactions.Food, "Ribs", "Food")
-                    if target then
-                        if not hasTeleported then
-                            local lookPos = target.Position
-                            local telePos = target.Position + Vector3.new(0, 40, 0)
-                            myRoot.CFrame = CFrame.lookAt(telePos, lookPos)
-                            Camera.CFrame = CFrame.lookAt(Camera.CFrame.Position, lookPos)
-                            hasTeleported = true
-                        end
-                        pressKey(Enum.KeyCode.E)
-                    end
-                end
+    local target = getClosestPart(Workspace.Interactions.Food, "Ribs", "Food")
+    if target then
+        if not hasTeleported then
+            local randomOffset = Vector3.new(math.random(-6,6), 3, math.random(-6,6))
+            local telePos = target.Position + randomOffset
+            myRoot.CFrame = CFrame.lookAt(telePos, target.Position)
+            Camera.CFrame = CFrame.lookAt(Camera.CFrame.Position, target.Position)
+            hasTeleported = true
+        end
+        pressKey(Enum.KeyCode.E)
+    end
+end
             elseif currentTask == "Sniff" then
                 pressKey(Enum.KeyCode.H)
             elseif currentTask == "Attack" then
