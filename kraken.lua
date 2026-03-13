@@ -92,6 +92,9 @@ local idleIndex = 1
 local lastIdleTime = 0
 local lastPosBeforeAttack = nil
 
+local sniffCooldown = 15
+local lastSniffTime = 0
+
 local idleCFrames = {
     CFrame.new(393.017365, 571.791687, -5.18445492, 0.0557625704, 6.04802486e-10, 0.99844408, -1.52293855e-11, 1, -6.04894468e-10, -0.99844408, 1.85247807e-11, 0.0557625704),
     CFrame.new(1997.70007, 441.18454, -680.129395, 0.507577777, 0.00243278989, -0.861602485, 7.87882968e-08, 0.999996006, 0.00282359915, 0.861605942, -0.00143326411, 0.50757575),
@@ -156,6 +159,12 @@ task.spawn(function()
         pcall(function()
             local myRoot = getMyChar():FindFirstChild("HumanoidRootPart")
             if not myRoot then return end
+                    
+                    -- Auto Sniff cooldown
+if tick() - lastSniffTime >= sniffCooldown then
+    pressKey(Enum.KeyCode.H)
+    lastSniffTime = tick()
+end
 
             local hud = LocalPlayer.PlayerGui.HUDGui.MissionsFrame.Other
             local qMud = hud:FindFirstChild("ConcealScent")
@@ -218,7 +227,7 @@ task.spawn(function()
                     local target = getClosest(Workspace.Interactions.Lakes, "SurfaceMask")
                     if target then
                         if not hasTeleported then
-                            myRoot.CFrame = target.CFrame * CFrame.new(0, 1, 0)
+                            myRoot.CFrame = target.CFrame * CFrame.new(0, 2, 0)
                             hasTeleported = true
                         end
                         pressKey(Enum.KeyCode.E)
@@ -238,7 +247,10 @@ Camera.CFrame = CFrame.lookAt(Camera.CFrame.Position, target.Position)
                     end
                 end
             elseif currentTask == "Sniff" then
-                pressKey(Enum.KeyCode.H)
+    if tick() - lastSniffTime >= sniffCooldown then
+        pressKey(Enum.KeyCode.H)
+        lastSniffTime = tick()
+    end
             elseif currentTask == "Attack" then
                 local chars = Workspace.Characters:GetChildren()
                 local enemy = nil
