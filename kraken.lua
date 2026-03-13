@@ -214,24 +214,30 @@ task.spawn(function()
                     foodMode = (foodMode == "Water") and "Food" or "Water"
                     hasTeleported = false
                 end
-if currentTask == "Drink" and foodMode == "Water" then
-    local target = getClosest(Workspace.Interactions.Lakes, "SurfaceMask")
-    if target then
-        if not hasTeleported then
+                if foodMode == "Water" then
+                    local target = getClosest(Workspace.Interactions.Lakes, "SurfaceMask")
+                    if target then
+                        if not hasTeleported then
+                            myRoot.CFrame = target.CFrame * CFrame.new(0, 40, 0)
+                            hasTeleported = true
+                        end
+                        pressKey(Enum.KeyCode.E)
+                    end
+                else
+                    local target = getClosestPart(Workspace.Interactions.Food, "Ribs", "Food")
+                   if target then
+    if not hasTeleported then
+        local randomOffset = Vector3.new(math.random(-6,6), 3, math.random(-6,6))
+        local telePos = target.Position + randomOffset
 
-            local dir = (myRoot.Position - target.Position).Unit
-            local edgePos = target.Position + (dir * 65) + Vector3.new(0,10,0)
+        myRoot.CFrame = CFrame.lookAt(telePos, target.Position)
+        Camera.CFrame = CFrame.lookAt(Camera.CFrame.Position, target.Position)
 
-            myRoot.CFrame = CFrame.lookAt(edgePos, target.Position)
-
-            hasTeleported = true
-        end
-
-        pressKey(Enum.KeyCode.E)
+        hasTeleported = true
     end
+    pressKey(Enum.KeyCode.E)
 end
-
-
+                end
             elseif currentTask == "Sniff" then
                 pressKey(Enum.KeyCode.H)
             elseif currentTask == "Attack" then
