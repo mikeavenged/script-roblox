@@ -223,7 +223,7 @@ end
                     local target = getClosest(Workspace.Interactions.Lakes, "SurfaceMask")
                     if target then
                         if not hasTeleported then
-                            myRoot.CFrame = target.CFrame * CFrame.new(0, 2, 0)
+                            myRoot.CFrame = target.CFrame * CFrame.new(0, 1, 0)
                             hasTeleported = true
                         end
                         pressKey(Enum.KeyCode.E)
