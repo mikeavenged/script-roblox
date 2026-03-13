@@ -87,7 +87,7 @@ local function clickMouse()
     task.wait(0.25)
 end
 
-_G.AutoFarm = false
+AutoFarm = false
 local currentTask = nil 
 local hasTeleported = false 
 local foodToggleTime = 0
@@ -154,7 +154,7 @@ end
 task.spawn(function()
     while true do
         task.wait(0.2) 
-        if not _G.AutoFarm then 
+        if not AutoFarm then 
             currentTask = nil
             hasTeleported = false
             continue 
@@ -293,21 +293,21 @@ end
     end
 end)
 
+local AutoFarm = false
 
-local AutoFarmToggle = MainTab:Toggle({
-    Title = "Auto Farm ",
-    Desc = "ฟาร์มโหดๆ555 ",
+MainTab:Toggle({
+    Title = "Auto Farm",
     Default = false,
-    Callback = function(Value)
-        _G.AutoFarm = Value
-        if not Value then 
-            currentTask = nil 
-            hasTeleported = false 
-            lastPosBeforeAttack = nil
+    Callback = function(state)
+        AutoFarm = state
+
+        if state then
+            warn("Auto Farm: ON")
+        else
+            warn("Auto Farm: OFF")
         end
     end
 })
-
 
 
 
