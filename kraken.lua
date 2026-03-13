@@ -94,6 +94,7 @@ local lastPosBeforeAttack = nil
 
 local lastSniffTime = 0
 local sniffCooldown = 15
+local drinkCount = 0
 
 local idleCFrames = {
     CFrame.new(393.017365, 571.791687, -5.18445492, 0.0557625704, 6.04802486e-10, 0.99844408, -1.52293855e-11, 1, -6.04894468e-10, -0.99844408, 1.85247807e-11, 0.0557625704),
@@ -219,28 +220,34 @@ end
                     foodMode = (foodMode == "Water") and "Food" or "Water"
                     hasTeleported = false
                 end
-                if foodMode == "Water" then
-                    local target = getClosest(Workspace.Interactions.Lakes, "SurfaceMask")
-                    if target then
-                        if not hasTeleported then
-                            myRoot.CFrame = target.CFrame * CFrame.new(0, 1, 0)
-                            hasTeleported = true
-                        end
-                        pressKey(Enum.KeyCode.E)
-                    end
-                else
-                    local target = getClosestPart(Workspace.Interactions.Food, "Ribs", "Food")
-                   if target then
-    if not hasTeleported then
-        local randomOffset = Vector3.new(math.random(-6,6), 3, math.random(-6,6))
-        local telePos = target.Position + randomOffset
+  if foodMode == "Water" then
+    local target = getClosest(Workspace.Interactions.Lakes, "SurfaceMask")
+    if target then
+        if not hasTeleported then
+            myRoot.CFrame = target.CFrame * CFrame.new(0, 1, 0)
+            hasTeleported = true
+            drinkCount = 0
+        end
 
-        myRoot.CFrame = CFrame.lookAt(telePos, target.Position)
-        Camera.CFrame = CFrame.lookAt(Camera.CFrame.Position, target.Position)
-
-        hasTeleported = true
+        if drinkCount < 10 then
+            pressKey(Enum.KeyCode.E)
+            drinkCount += 1
+        end
     end
-    pressKey(Enum.KeyCode.E)
+else
+    local target = getClosestPart(Workspace.Interactions.Food, "Ribs", "Food")
+    if target then
+        if not hasTeleported then
+            local randomOffset = Vector3.new(math.random(-6,6), 3, math.random(-6,6))
+            local telePos = target.Position + randomOffset
+
+            myRoot.CFrame = CFrame.lookAt(telePos, target.Position)
+            Camera.CFrame = CFrame.lookAt(Camera.CFrame.Position, target.Position)
+
+            hasTeleported = true
+        end
+        pressKey(Enum.KeyCode.E)
+    end
 end
                 end
             elseif currentTask == "Sniff" then
