@@ -79,7 +79,7 @@ local function isHungry()
     local hunger = bars:FindFirstChild("Hunger")
     if hunger and hunger:FindFirstChild("Bar") then
         local size = hunger.Bar.Size.X.Scale
-        return size < 0.6 -- ถ้าน้อยกว่า 60% ถือว่าหิว
+        return size < 0.9 -- ถ้าน้อยกว่า 60% ถือว่าหิว
     end
     
     return false
@@ -95,7 +95,7 @@ local function isThirsty()
     local thirst = bars:FindFirstChild("Thirst")
     if thirst and thirst:FindFirstChild("Bar") then
         local size = thirst.Bar.Size.X.Scale
-        return size < 0.6
+        return size < 0.9
     end
     
     return false
