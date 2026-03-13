@@ -92,6 +92,9 @@ local idleIndex = 1
 local lastIdleTime = 0
 local lastPosBeforeAttack = nil
 
+local lastSniffTime = 0
+local sniffCooldown = 15
+
 local idleCFrames = {
     CFrame.new(393.017365, 571.791687, -5.18445492, 0.0557625704, 6.04802486e-10, 0.99844408, -1.52293855e-11, 1, -6.04894468e-10, -0.99844408, 1.85247807e-11, 0.0557625704),
     CFrame.new(1997.70007, 441.18454, -680.129395, 0.507577777, 0.00243278989, -0.861602485, 7.87882968e-08, 0.999996006, 0.00282359915, 0.861605942, -0.00143326411, 0.50757575),
@@ -179,7 +182,9 @@ task.spawn(function()
                 local taskPool = {}
                 if qMud and qMud.Visible then table.insert(taskPool, "Mud") end
                 if qDrink and qDrink.Visible then table.insert(taskPool, "Drink") end
-                if qSniff and qSniff.Visible then table.insert(taskPool, "Sniff") end
+                if qSniff and qSniff.Visible and tick() - lastSniffTime >= sniffCooldown then
+    table.insert(taskPool, "Sniff")
+end
                 if qAttack and qAttack.Visible then table.insert(taskPool, "Attack") end
                 
                 if #taskPool > 0 then
@@ -240,6 +245,8 @@ end
                 end
             elseif currentTask == "Sniff" then
                 pressKey(Enum.KeyCode.H)
+                        lastSniffTime = tick()
+                        currentTask = nil
             elseif currentTask == "Attack" then
                 local chars = Workspace.Characters:GetChildren()
                 local enemy = nil
