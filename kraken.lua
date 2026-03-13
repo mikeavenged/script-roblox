@@ -69,38 +69,6 @@ local LocalPlayer = Players.LocalPlayer
 local Workspace = game:GetService("Workspace")
 local Camera = Workspace.CurrentCamera
 
-local function isHungry()
-    local hud = LocalPlayer.PlayerGui:FindFirstChild("HUDGui")
-    if not hud then return false end
-    
-    local bars = hud:FindFirstChild("Bars")
-    if not bars then return false end
-    
-    local hunger = bars:FindFirstChild("Hunger")
-    if hunger and hunger:FindFirstChild("Bar") then
-        local size = hunger.Bar.Size.X.Scale
-        return size < 0.9 -- ถ้าน้อยกว่า 60% ถือว่าหิว
-    end
-    
-    return false
-end
-
-local function isThirsty()
-    local hud = LocalPlayer.PlayerGui:FindFirstChild("HUDGui")
-    if not hud then return false end
-    
-    local bars = hud:FindFirstChild("Bars")
-    if not bars then return false end
-    
-    local thirst = bars:FindFirstChild("Thirst")
-    if thirst and thirst:FindFirstChild("Bar") then
-        local size = thirst.Bar.Size.X.Scale
-        return size < 0.9
-    end
-    
-    return false
-end
-
 local function pressKey(keyCode)
     VirtualInputManager:SendKeyEvent(true, keyCode, false, game)
     task.wait(0.25)
@@ -197,8 +165,6 @@ task.spawn(function()
             local qDrink = hud:FindFirstChild("EatFoodDrinkWater")
             local qSniff = hud:FindFirstChild("Sniff")
             local qAttack = hud:FindFirstChild("AttackOrHealCreatureOrNPC")
-            local qTravel = hud:FindFirstChild("Travel")
-                    
             
             if currentTask == "Mud" and (not qMud or not qMud.Visible) then currentTask = nil end
             if currentTask == "Drink" and (not qDrink or not qDrink.Visible) then currentTask = nil end
@@ -215,13 +181,7 @@ task.spawn(function()
             if currentTask == nil then
                 local taskPool = {}
                 if qMud and qMud.Visible then table.insert(taskPool, "Mud") end
-                if qDrink and qDrink.Visible then
-    table.insert(taskPool, "Drink")
-end
-
-if qTravel and qTravel.Visible then
-    table.insert(taskPool, "Travel")
-end
+                if qDrink and qDrink.Visible then table.insert(taskPool, "Drink") end
                 if qSniff and qSniff.Visible and tick() - lastSniffTime >= sniffCooldown then
     table.insert(taskPool, "Sniff")
 end
@@ -253,51 +213,36 @@ end
                     end
                     pressKey(Enum.KeyCode.E)
                 end
-           elseif currentTask == "Drink" then
-
-    if tick() - foodToggleTime >= 10 then
-        foodToggleTime = tick()
-        foodMode = (foodMode == "Water") and "Food" or "Water"
-        hasTeleported = false
-    end
-
-    if foodMode == "Water" then
-
-        local target =
-            getClosest(Workspace.Interactions.Lakes, "SurfaceMask") or
-            getClosest(Workspace.Interactions.Lakes, "Surface") or
-            getClosest(Workspace.Interactions.Lakes, "Water")
-
-        if target then
-        if not hasTeleported then
-
-            local offset = Vector3.new(math.random(-4,4),0.5,math.random(-4,4))
-            local pos = target.Position + offset
-
-            myRoot.CFrame = CFrame.lookAt(pos, target.Position)
-
-            hasTeleported = true
-        end
-        pressKey(Enum.KeyCode.E)
-    end
-
-    else
-
-        local target = getClosestPart(Workspace.Interactions.Food, "Ribs", "Food")
-
-        if target then
-            if not hasTeleported then
-                local randomOffset = Vector3.new(math.random(-6,6),3,math.random(-6,6))
-                local telePos = target.Position + randomOffset
-
-                myRoot.CFrame = CFrame.lookAt(telePos, target.Position)
-                Camera.CFrame = CFrame.lookAt(Camera.CFrame.Position, target.Position)
-
-                hasTeleported = true
-            end
-            pressKey(Enum.KeyCode.E)
-        end
+            elseif currentTask == "Drink" then
+                if tick() - foodToggleTime >= 10 then
+                    foodToggleTime = tick()
+                    foodMode = (foodMode == "Water") and "Food" or "Water"
+                    hasTeleported = false
+                end
+                if foodMode == "Water" then
+                    local target = getClosest(Workspace.Interactions.Lakes, "SurfaceMask")
+                    if target then
+                        if not hasTeleported then
+                            myRoot.CFrame = target.CFrame * CFrame.new(0, 2, 0)
+                            hasTeleported = true
                         end
+                        pressKey(Enum.KeyCode.E)
+                    end
+                else
+                    local target = getClosestPart(Workspace.Interactions.Food, "Ribs", "Food")
+                   if target then
+    if not hasTeleported then
+        local randomOffset = Vector3.new(math.random(-6,6), 3, math.random(-6,6))
+        local telePos = target.Position + randomOffset
+
+        myRoot.CFrame = CFrame.lookAt(telePos, target.Position)
+        Camera.CFrame = CFrame.lookAt(Camera.CFrame.Position, target.Position)
+
+        hasTeleported = true
+    end
+    pressKey(Enum.KeyCode.E)
+end
+                end
             elseif currentTask == "Sniff" then
                 pressKey(Enum.KeyCode.H)
                         lastSniffTime = tick()
@@ -318,17 +263,7 @@ end
                     myRoot.CFrame = enemy.HumanoidRootPart.CFrame * CFrame.new(0, 0, 2)
                     clickMouse()
                 end
-elseif currentTask == "Travel" then
-    local randomMove = Vector3.new(
-        math.random(-150,150),
-        0,
-        math.random(-150,150)
-    )
-
-    myRoot.CFrame = myRoot.CFrame + randomMove
-    task.wait(0.3)
-end
-
+            end
         end)
     end
 end)
