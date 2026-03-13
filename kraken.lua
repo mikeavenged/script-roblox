@@ -197,6 +197,8 @@ task.spawn(function()
             local qDrink = hud:FindFirstChild("EatFoodDrinkWater")
             local qSniff = hud:FindFirstChild("Sniff")
             local qAttack = hud:FindFirstChild("AttackOrHealCreatureOrNPC")
+            local qTravel = hud:FindFirstChild("Travel")
+                    
             
             if currentTask == "Mud" and (not qMud or not qMud.Visible) then currentTask = nil end
             if currentTask == "Drink" and (not qDrink or not qDrink.Visible) then currentTask = nil end
@@ -213,7 +215,12 @@ task.spawn(function()
             if currentTask == nil then
                 local taskPool = {}
                 if qMud and qMud.Visible then table.insert(taskPool, "Mud") end
-                if qDrink and qDrink.Visible and (isHungry() or isThirsty()) then table.insert(taskPool, "Drink")
+                if qDrink and qDrink.Visible and (isHungry() or isThirsty()) then
+    table.insert(taskPool, "Drink")
+end
+
+if qTravel and qTravel.Visible then
+    table.insert(taskPool, "Travel")
 end
                 if qSniff and qSniff.Visible and tick() - lastSniffTime >= sniffCooldown then
     table.insert(taskPool, "Sniff")
@@ -296,7 +303,17 @@ end
                     myRoot.CFrame = enemy.HumanoidRootPart.CFrame * CFrame.new(0, 0, 2)
                     clickMouse()
                 end
-            end
+elseif currentTask == "Travel" then
+    local randomMove = Vector3.new(
+        math.random(-150,150),
+        0,
+        math.random(-150,150)
+    )
+
+    myRoot.CFrame = myRoot.CFrame + randomMove
+    task.wait(0.3)
+end
+
         end)
     end
 end)
