@@ -229,16 +229,25 @@ task.spawn(function()
                 else
                     local target = getClosestPart(Workspace.Interactions.Food, "Ribs", "Food")
                     if target then
-                        if not hasTeleported then
-                            local lookPos = target.Position
-                            local telePos = target.Position + Vector3.new(0, 60, 0)
-                            myRoot.CFrame = CFrame.lookAt(telePos, lookPos)
-                            Camera.CFrame = CFrame.lookAt(Camera.CFrame.Position, lookPos)
-                            hasTeleported = true
-                        end
-                        pressKey(Enum.KeyCode.E)
-                    end
-                end
+    local humanoid = getMyChar():FindFirstChildOfClass("Humanoid")
+
+    local foodPos = target.Position
+    local standPos = foodPos + Vector3.new(0,3,8) -- ยืนห่างจากอาหาร
+
+    -- วาปไปใกล้อาหาร
+    myRoot.CFrame = CFrame.new(standPos, foodPos)
+
+    -- เดินเข้าไปหาอาหาร
+    if humanoid then
+        humanoid:MoveTo(foodPos)
+    end
+
+    -- รอให้เดินถึงก่อนกดกิน
+    task.wait(1)
+
+    pressKey(Enum.KeyCode.E)
+                            end
+                            end
             elseif currentTask == "Sniff" then
                         pressKey(Enum.KeyCode.H)
                         lastSniff = tick()
@@ -277,5 +286,6 @@ local AutoFarmToggle = MainTab:Toggle({
         end
     end
 })
+
 
 
