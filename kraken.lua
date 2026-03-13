@@ -214,38 +214,23 @@ task.spawn(function()
                     foodMode = (foodMode == "Water") and "Food" or "Water"
                     hasTeleported = false
                 end
-if foodMode == "Water" then
+if currentTask == "Drink" and foodMode == "Water" then
     local target = getClosest(Workspace.Interactions.Lakes, "SurfaceMask")
     if target then
         if not hasTeleported then
 
             local dir = (myRoot.Position - target.Position).Unit
-            local foundPos = nil
+            local edgePos = target.Position + (dir * 65) + Vector3.new(0,10,0)
 
-            for dist = 35,80,5 do
-                local checkPos = target.Position + (dir * dist) + Vector3.new(0,15,0)
+            myRoot.CFrame = CFrame.lookAt(edgePos, target.Position)
 
-                local rayParams = RaycastParams.new()
-                rayParams.FilterDescendantsInstances = {getMyChar()}
-                rayParams.FilterType = Enum.RaycastFilterType.Blacklist
-
-                local result = Workspace:Raycast(checkPos, Vector3.new(0,-50,0), rayParams)
-
-                if result then
-                    foundPos = result.Position + Vector3.new(0,5,0)
-                    break
-                end
-            end
-
-            if foundPos then
-                myRoot.CFrame = CFrame.lookAt(foundPos, target.Position)
-                hasTeleported = true
-            end
+            hasTeleported = true
         end
 
         pressKey(Enum.KeyCode.E)
     end
 end
+
 
             elseif currentTask == "Sniff" then
                 pressKey(Enum.KeyCode.H)
