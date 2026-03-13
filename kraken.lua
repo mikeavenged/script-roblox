@@ -194,6 +194,10 @@ task.spawn(function()
                         lastPosBeforeAttack = myRoot.CFrame
                     end
                 else
+                            -- กันจมดิน
+if myRoot and myRoot.Position.Y < -5 then
+    myRoot.CFrame = myRoot.CFrame + Vector3.new(0,20,0)
+end
                     if myRoot and tick() - lastIdleTime >= 5 then
                         myRoot.CFrame = idleCFrames[idleIndex]
                         idleIndex = (idleIndex % #idleCFrames) + 1
@@ -299,6 +303,7 @@ local AutoFarmToggle = MainTab:Toggle({
         end
     end
 })
+
 
 
 
