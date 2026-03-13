@@ -218,8 +218,13 @@ task.spawn(function()
                     local target = getClosest(Workspace.Interactions.Lakes, "SurfaceMask")
                     if target then
                         if not hasTeleported then
-                            local offset = target.CFrame.LookVector * -6
-                            local standPos = target.Position + offset + Vector3.new(0,3,0)
+
+                            local myPos = myRoot.Position
+                            local waterPos = target.Position
+                                    
+                            local direction = (waterPos - myPos).Unit        
+                            local standPos = waterPos - direction * 12
+                            standPos = standPos + Vector3.new(0,3,0)
                                     
                             myRoot.CFrame = CFrame.lookAt(standPos, target.Position)
                                 
