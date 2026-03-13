@@ -218,7 +218,11 @@ task.spawn(function()
                     local target = getClosest(Workspace.Interactions.Lakes, "SurfaceMask")
                     if target then
                         if not hasTeleported then
-                            myRoot.CFrame = target.CFrame * CFrame.new(0, 100, 0)
+                            local offset = target.CFrame.LookVector * -6
+                            local standPos = target.Position + offset + Vector3.new(0,3,0)
+                                    
+                            myRoot.CFrame = CFrame.lookAt(standPos, target.Position)
+                                
                             hasTeleported = true
                         end
                         pressKey(Enum.KeyCode.E)
