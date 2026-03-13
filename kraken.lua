@@ -269,12 +269,17 @@ end
             getClosest(Workspace.Interactions.Lakes, "Water")
 
         if target then
-            if not hasTeleported then
-                myRoot.CFrame = target.CFrame * CFrame.new(0, 1, 0)
-                hasTeleported = true
-            end
-            pressKey(Enum.KeyCode.E)
+        if not hasTeleported then
+
+            local offset = Vector3.new(math.random(-4,4),0.5,math.random(-4,4))
+            local pos = target.Position + offset
+
+            myRoot.CFrame = CFrame.lookAt(pos, target.Position)
+
+            hasTeleported = true
         end
+        pressKey(Enum.KeyCode.E)
+    end
 
     else
 
