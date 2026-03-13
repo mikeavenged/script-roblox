@@ -1,7 +1,3 @@
-repeat task.wait() until game.Players.LocalPlayer.Character
-
-print("KRAKEN SCRIPT LOADED")
-warn("KRAKEN STARTED")
 local lakesFolder = workspace.Interactions.Lakes
 for _, object in pairs(lakesFolder:GetDescendants()) do
     if object:IsA("BasePart") then
@@ -11,7 +7,7 @@ end
 
 
 -- ================== Windows  ================== --
-local WindUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/Footagesus/WindUI/main/main.lua"))()
+local WindUI = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"))()
 local Folder = "KRAKENX"
 local AutoLoadFile = Folder .. "/autoload.txt"
 local Window = WindUI:CreateWindow({
@@ -87,7 +83,7 @@ local function clickMouse()
     task.wait(0.25)
 end
 
-AutoFarm = false
+_G.AutoFarm = false
 local currentTask = nil 
 local hasTeleported = false 
 local foodToggleTime = 0
@@ -95,8 +91,6 @@ local foodMode = "Water"
 local idleIndex = 1
 local lastIdleTime = 0
 local lastPosBeforeAttack = nil
-local lastSniff = 0
-local sniffCooldown = 15
 
 local idleCFrames = {
     CFrame.new(393.017365, 571.791687, -5.18445492, 0.0557625704, 6.04802486e-10, 0.99844408, -1.52293855e-11, 1, -6.04894468e-10, -0.99844408, 1.85247807e-11, 0.0557625704),
@@ -154,7 +148,7 @@ end
 task.spawn(function()
     while true do
         task.wait(0.2) 
-        if not AutoFarm then 
+        if not _G.AutoFarm then 
             currentTask = nil
             hasTeleported = false
             continue 
@@ -185,7 +179,7 @@ task.spawn(function()
                 local taskPool = {}
                 if qMud and qMud.Visible then table.insert(taskPool, "Mud") end
                 if qDrink and qDrink.Visible then table.insert(taskPool, "Drink") end
-                if qSniff and qSniff.Visible and tick() - lastSniff > sniffCooldown then table.insert(taskPool, "Sniff") end
+                if qSniff and qSniff.Visible then table.insert(taskPool, "Sniff") end
                 if qAttack and qAttack.Visible then table.insert(taskPool, "Attack") end
                 
                 if #taskPool > 0 then
@@ -197,28 +191,23 @@ task.spawn(function()
                         lastPosBeforeAttack = myRoot.CFrame
                     end
                 else
--- กันจมดิน
-if myRoot and myRoot.Position.Y < 10 then
-    myRoot.CFrame = myRoot.CFrame + Vector3.new(0,35,0)
-end
-
-if currentTask == "Mud" then
-    local target = getClosest(Workspace.Interactions.Mud, "Mud")
-    if target then
-        if not hasTeleported then
-            myRoot.CFrame = target.CFrame * CFrame.new(0,80,0)
-            hasTeleported = true
-        end
-
-        task.wait(0.2)
-
-        if myRoot and target and myRoot.Position.Y < target.Position.Y then
-            myRoot.CFrame = target.CFrame * CFrame.new(0,80,0)
-        end
-
-        pressKey(Enum.KeyCode.E)
-    end
-end
+                    if myRoot and tick() - lastIdleTime >= 5 then
+                        myRoot.CFrame = idleCFrames[idleIndex]
+                        idleIndex = (idleIndex % #idleCFrames) + 1
+                        lastIdleTime = tick()
+                    end
+                end
+            end
+            
+            if currentTask == "Mud" then
+                local target = getClosest(Workspace.Interactions.Mud, "Mud")
+                if target then
+                    if not hasTeleported then
+                        myRoot.CFrame = target.CFrame * CFrame.new(0, 40, 0)
+                        hasTeleported = true
+                    end
+                    pressKey(Enum.KeyCode.E)
+                end
             elseif currentTask == "Drink" then
                 if tick() - foodToggleTime >= 10 then
                     foodToggleTime = tick()
@@ -235,43 +224,20 @@ end
                         pressKey(Enum.KeyCode.E)
                     end
                 else
-                            -- เช็คค่าความหิว
-   local hungerText = game.Players.LocalPlayer.PlayerGui:FindFirstChild("HungerText", true)
-
-    local hungerValue = 60
-    if hungerText then
-        local current, max = hungerText.Text:match("(%d+)/(%d+)")
-        hungerValue = tonumber(current)
-    end
-
-    -- ถ้าอิ่มให้ข้ามการกิน
-    if hungerValue >= 55 then
-    task.wait(5)
-    else
                     local target = getClosestPart(Workspace.Interactions.Food, "Ribs", "Food")
                     if target then
-    local humanoid = getMyChar():FindFirstChildOfClass("Humanoid")
-
-    local foodPos = target.Position
-    local standPos = foodPos + Vector3.new(0,3,8) -- ยืนห่างจากอาหาร
-
-    -- วาปไปใกล้อาหาร
-    myRoot.CFrame = CFrame.new(standPos, foodPos)
-
-    -- เดินเข้าไปหาอาหาร
-    if humanoid then
-        humanoid:MoveTo(foodPos)
-    end
-
-    -- รอให้เดินถึงก่อนกดกิน
-    task.wait(1)
-
-    pressKey(Enum.KeyCode.E)
-                            end
-                            end
+                        if not hasTeleported then
+                            local lookPos = target.Position
+                            local telePos = target.Position + Vector3.new(0, 40, 0)
+                            myRoot.CFrame = CFrame.lookAt(telePos, lookPos)
+                            Camera.CFrame = CFrame.lookAt(Camera.CFrame.Position, lookPos)
+                            hasTeleported = true
+                        end
+                        pressKey(Enum.KeyCode.E)
+                    end
+                end
             elseif currentTask == "Sniff" then
-                        pressKey(Enum.KeyCode.H)
-                        lastSniff = tick()
+                pressKey(Enum.KeyCode.H)
             elseif currentTask == "Attack" then
                 local chars = Workspace.Characters:GetChildren()
                 local enemy = nil
@@ -293,22 +259,16 @@ end
     end
 end)
 
-local AutoFarm = false
-
-MainTab:Toggle({
-    Title = "Auto Farm",
+local AutoFarmToggle = MainTab:Toggle({
+    Title = "Auto Farm ",
+    Desc = "ฟาร์มโหดๆ555 ",
     Default = false,
-    Callback = function(state)
-        AutoFarm = state
-
-        if state then
-            warn("Auto Farm: ON")
-        else
-            warn("Auto Farm: OFF")
+    Callback = function(Value)
+        _G.AutoFarm = Value
+        if not Value then 
+            currentTask = nil 
+            hasTeleported = false 
+            lastPosBeforeAttack = nil
         end
     end
 })
-
-
-
-
