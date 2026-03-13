@@ -194,27 +194,28 @@ task.spawn(function()
                         lastPosBeforeAttack = myRoot.CFrame
                     end
                 else
-                            -- กันจมดิน
-if myRoot and myRoot.Position.Y < -5 then
-    myRoot.CFrame = myRoot.CFrame + Vector3.new(0,20,0)
+-- กันจมดิน
+if myRoot and myRoot.Position.Y < 10 then
+    myRoot.CFrame = myRoot.CFrame + Vector3.new(0,35,0)
 end
-                    if myRoot and tick() - lastIdleTime >= 5 then
-                        myRoot.CFrame = idleCFrames[idleIndex]
-                        idleIndex = (idleIndex % #idleCFrames) + 1
-                        lastIdleTime = tick()
-                    end
-                end
-            end
-            
-            if currentTask == "Mud" then
-                local target = getClosest(Workspace.Interactions.Mud, "Mud")
-                if target then
-                    if not hasTeleported then
-                        myRoot.CFrame = target.CFrame * CFrame.new(0, 40, 0)
-                        hasTeleported = true
-                    end
-                    pressKey(Enum.KeyCode.E)
-                end
+
+if currentTask == "Mud" then
+    local target = getClosest(Workspace.Interactions.Mud, "Mud")
+    if target then
+        if not hasTeleported then
+            myRoot.CFrame = target.CFrame * CFrame.new(0,80,0)
+            hasTeleported = true
+        end
+
+        task.wait(0.2)
+
+        if myRoot and target and myRoot.Position.Y < target.Position.Y then
+            myRoot.CFrame = target.CFrame * CFrame.new(0,80,0)
+        end
+
+        pressKey(Enum.KeyCode.E)
+    end
+end
             elseif currentTask == "Drink" then
                 if tick() - foodToggleTime >= 10 then
                     foodToggleTime = tick()
