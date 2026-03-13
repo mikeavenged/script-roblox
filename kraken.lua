@@ -215,7 +215,7 @@ task.spawn(function()
             if currentTask == nil then
                 local taskPool = {}
                 if qMud and qMud.Visible then table.insert(taskPool, "Mud") end
-                if qDrink and qDrink.Visible and (isHungry() or isThirsty()) then
+                if qDrink and qDrink.Visible then
     table.insert(taskPool, "Drink")
 end
 
@@ -253,36 +253,46 @@ end
                     end
                     pressKey(Enum.KeyCode.E)
                 end
-            elseif currentTask == "Drink" then
-                if tick() - foodToggleTime >= 10 then
-                    foodToggleTime = tick()
-                    foodMode = (foodMode == "Water") and "Food" or "Water"
-                    hasTeleported = false
-                end
-                if foodMode == "Water" then
-                    local target = getClosest(Workspace.Interactions.Lakes, "SurfaceMask")
-                    if target then
-                        if not hasTeleported then
-                            myRoot.CFrame = target.CFrame * CFrame.new(0, 1.5, 0)
-                            hasTeleported = true
-                        end
-                        pressKey(Enum.KeyCode.E)
-                    end
-                else
-                    local target = getClosestPart(Workspace.Interactions.Food, "Ribs", "Food")
-                   if target then
-    if not hasTeleported then
-        local randomOffset = Vector3.new(math.random(-6,6), 3, math.random(-6,6))
-        local telePos = target.Position + randomOffset
+           elseif currentTask == "Drink" then
 
-        myRoot.CFrame = CFrame.lookAt(telePos, target.Position)
-        Camera.CFrame = CFrame.lookAt(Camera.CFrame.Position, target.Position)
-
-        hasTeleported = true
+    if tick() - foodToggleTime >= 10 then
+        foodToggleTime = tick()
+        foodMode = (foodMode == "Water") and "Food" or "Water"
+        hasTeleported = false
     end
-    pressKey(Enum.KeyCode.E)
-end
-                end
+
+    if foodMode == "Water" then
+
+        local target =
+            getClosest(Workspace.Interactions.Lakes, "SurfaceMask") or
+            getClosest(Workspace.Interactions.Lakes, "Surface") or
+            getClosest(Workspace.Interactions.Lakes, "Water")
+
+        if target then
+            if not hasTeleported then
+                myRoot.CFrame = target.CFrame * CFrame.new(0, 2, 0)
+                hasTeleported = true
+            end
+            pressKey(Enum.KeyCode.E)
+        end
+
+    else
+
+        local target = getClosestPart(Workspace.Interactions.Food, "Ribs", "Food")
+
+        if target then
+            if not hasTeleported then
+                local randomOffset = Vector3.new(math.random(-6,6),3,math.random(-6,6))
+                local telePos = target.Position + randomOffset
+
+                myRoot.CFrame = CFrame.lookAt(telePos, target.Position)
+                Camera.CFrame = CFrame.lookAt(Camera.CFrame.Position, target.Position)
+
+                hasTeleported = true
+            end
+            pressKey(Enum.KeyCode.E)
+        end
+                        end
             elseif currentTask == "Sniff" then
                 pressKey(Enum.KeyCode.H)
                         lastSniffTime = tick()
