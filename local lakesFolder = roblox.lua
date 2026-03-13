@@ -1,3 +1,4 @@
+print("script loaded")
 local lakesFolder = workspace.Interactions.Lakes
 for _, object in pairs(lakesFolder:GetDescendants()) do
     if object:IsA("BasePart") then
@@ -272,3 +273,4 @@ local AutoFarmToggle = MainTab:Toggle({
         end
     end
 })
+
