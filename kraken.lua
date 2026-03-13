@@ -214,35 +214,30 @@ task.spawn(function()
                     foodMode = (foodMode == "Water") and "Food" or "Water"
                     hasTeleported = false
                 end
-if foodMode == "Water" then
-    local target = getClosest(Workspace.Interactions.Lakes, "SurfaceMask")
-    if target then
-        if not hasTeleported then
-            local offset = Vector3.new(math.random(-8,8), 8, math.random(6,10))
-            local telePos = target.Position + offset
+                if foodMode == "Water" then
+                    local target = getClosest(Workspace.Interactions.Lakes, "SurfaceMask")
+                    if target then
+                        if not hasTeleported then
+                            myRoot.CFrame = target.CFrame * CFrame.new(0, 40, 0)
+                            hasTeleported = true
+                        end
+                        pressKey(Enum.KeyCode.E)
+                    end
+                else
+                    local target = getClosestPart(Workspace.Interactions.Food, "Ribs", "Food")
+                   if target then
+    if not hasTeleported then
+        local randomOffset = Vector3.new(math.random(-6,6), 3, math.random(-6,6))
+        local telePos = target.Position + randomOffset
 
-            myRoot.CFrame = CFrame.lookAt(telePos, target.Position)
+        myRoot.CFrame = CFrame.lookAt(telePos, target.Position)
+        Camera.CFrame = CFrame.lookAt(Camera.CFrame.Position, target.Position)
 
-            hasTeleported = true
-        end
-        pressKey(Enum.KeyCode.E)
+        hasTeleported = true
     end
-
-else
-    local target = getClosestPart(Workspace.Interactions.Food, "Ribs", "Food")
-    if target then
-        if not hasTeleported then
-            local randomOffset = Vector3.new(math.random(-6,6), 3, math.random(-6,6))
-            local telePos = target.Position + randomOffset
-
-            myRoot.CFrame = CFrame.lookAt(telePos, target.Position)
-            Camera.CFrame = CFrame.lookAt(Camera.CFrame.Position, target.Position)
-
-            hasTeleported = true
-        end
-        pressKey(Enum.KeyCode.E)
-    end
+    pressKey(Enum.KeyCode.E)
 end
+                end
             elseif currentTask == "Sniff" then
                 pressKey(Enum.KeyCode.H)
             elseif currentTask == "Attack" then
