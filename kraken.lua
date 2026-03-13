@@ -1,3 +1,5 @@
+repeat task.wait() until game.Players.LocalPlayer.Character
+
 print("KRAKEN SCRIPT LOADED")
 warn("KRAKEN STARTED")
 local lakesFolder = workspace.Interactions.Lakes
@@ -9,7 +11,7 @@ end
 
 
 -- ================== Windows  ================== --
-local WindUI = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"))()
+local WindUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/Footagesus/WindUI/main/main.lua"))()
 local Folder = "KRAKENX"
 local AutoLoadFile = Folder .. "/autoload.txt"
 local Window = WindUI:CreateWindow({
