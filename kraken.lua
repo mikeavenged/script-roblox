@@ -227,6 +227,19 @@ task.spawn(function()
                         pressKey(Enum.KeyCode.E)
                     end
                 else
+                            -- เช็คค่าความหิว
+   local hungerText = game.Players.LocalPlayer.PlayerGui:FindFirstChild("HungerText", true)
+
+    local hungerValue = 60
+    if hungerText then
+        local current, max = hungerText.Text:match("(%d+)/(%d+)")
+        hungerValue = tonumber(current)
+    end
+
+    -- ถ้าอิ่มให้ข้ามการกิน
+    if hungerValue >= 55 then
+    task.wait(5)
+    else
                     local target = getClosestPart(Workspace.Interactions.Food, "Ribs", "Food")
                     if target then
     local humanoid = getMyChar():FindFirstChildOfClass("Humanoid")
@@ -286,6 +299,7 @@ local AutoFarmToggle = MainTab:Toggle({
         end
     end
 })
+
 
 
 
