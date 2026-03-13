@@ -220,8 +220,8 @@ task.spawn(function()
                         if not hasTeleported then
                                     
                             local dir = (myRoot.Position - target.Position).Unit        
-                            local edgeOffset = dir * 30
-                            local pos = target.Position + edgeOffset + Vector3.new(0,6,0)
+                            local edgeOffset = dir * 60
+                            local pos = target.Position + edgeOffset + Vector3.new(0,12,0)
                                     
                             myRoot.CFrame = CFrame.lookAt(pos, target.Position)
                                     
