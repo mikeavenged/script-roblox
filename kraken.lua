@@ -91,6 +91,7 @@ local foodMode = "Water"
 local idleIndex = 1
 local lastIdleTime = 0
 local lastPosBeforeAttack = nil
+local lastSniffTime = 0
 
 local idleCFrames = {
     CFrame.new(393.017365, 571.791687, -5.18445492, 0.0557625704, 6.04802486e-10, 0.99844408, -1.52293855e-11, 1, -6.04894468e-10, -0.99844408, 1.85247807e-11, 0.0557625704),
@@ -227,17 +228,27 @@ task.spawn(function()
                     local target = getClosestPart(Workspace.Interactions.Food, "Ribs", "Food")
                     if target then
                         if not hasTeleported then
-                            local lookPos = target.Position
-                            local telePos = target.Position + Vector3.new(0, 40, 0)
-                            myRoot.CFrame = CFrame.lookAt(telePos, lookPos)
-                            Camera.CFrame = CFrame.lookAt(Camera.CFrame.Position, lookPos)
+                           local lookPos = target.Position
+
+-- ถอยหลังจากเนื้อ
+local backOffset = target.CFrame.LookVector * -6
+
+-- วาปเหนือเนื้อเล็กน้อย + ถอยหลัง
+local telePos = target.Position + backOffset + Vector3.new(0,5,0)
+
+-- หันหน้าเข้าเนื้อ
+myRoot.CFrame = CFrame.lookAt(telePos, lookPos)
+Camera.CFrame = CFrame.lookAt(Camera.CFrame.Position, lookPos)
                             hasTeleported = true
                         end
                         pressKey(Enum.KeyCode.E)
                     end
                 end
             elseif currentTask == "Sniff" then
+                        if tick() - lastSniffTime >= 15 then
                 pressKey(Enum.KeyCode.H)
+                            lastSniffTime = tick()
+    end
             elseif currentTask == "Attack" then
                 local chars = Workspace.Characters:GetChildren()
                 local enemy = nil
