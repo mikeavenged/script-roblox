@@ -69,6 +69,18 @@ local LocalPlayer = Players.LocalPlayer
 local Workspace = game:GetService("Workspace")
 local Camera = Workspace.CurrentCamera
 
+local function getHungerPercent()
+    local hud = LocalPlayer.PlayerGui:FindFirstChild("HUDGui")
+    if not hud then return 0 end
+    
+    local hungerBar = hud:FindFirstChild("HungerBar", true)
+    if hungerBar and hungerBar:FindFirstChild("Fill") then
+        return hungerBar.Fill.Size.X.Scale * 100
+    end
+    
+    return 0
+end
+
 local function pressKey(keyCode)
     VirtualInputManager:SendKeyEvent(true, keyCode, false, game)
     task.wait(0.25)
@@ -94,6 +106,7 @@ local lastPosBeforeAttack = nil
 
 local sniffCooldown = 15
 local lastSniffTime = 0
+local forceEat = false
 
 local idleCFrames = {
     CFrame.new(393.017365, 571.791687, -5.18445492, 0.0557625704, 6.04802486e-10, 0.99844408, -1.52293855e-11, 1, -6.04894468e-10, -0.99844408, 1.85247807e-11, 0.0557625704),
@@ -159,6 +172,17 @@ task.spawn(function()
         pcall(function()
             local myRoot = getMyChar():FindFirstChild("HumanoidRootPart")
             if not myRoot then return end
+
+                    local hunger = getHungerPercent()
+
+if hunger <= 2 then
+    forceEat = true
+elseif hunger >= 98 then
+    forceEat = false
+end
+                    if forceEat then
+    currentTask = "Drink"
+end
                     
                     -- Auto Sniff cooldown
 if tick() - lastSniffTime >= sniffCooldown then
@@ -184,7 +208,7 @@ end
                 currentTask = nil 
             end
             
-            if currentTask == nil then
+            if currentTask == nil and not forceEat then
                 local taskPool = {}
                 if qMud and qMud.Visible then table.insert(taskPool, "Mud") end
                 if qDrink and qDrink.Visible then table.insert(taskPool, "Drink") end
@@ -217,13 +241,13 @@ end
                     end
                     pressKey(Enum.KeyCode.E)
                 end
-            elseif currentTask == "Drink" then
-                if tick() - foodToggleTime >= 10 then
+            elseif currentTask == "Drink" or forceEat then
+                if not forceEat and tick() - foodToggleTime >= 10 then
                     foodToggleTime = tick()
                     foodMode = (foodMode == "Water") and "Food" or "Water"
                     hasTeleported = false
                 end
-                if foodMode == "Water" then
+                if foodMode == "Water" and not forceEat then
                     local target = getClosest(Workspace.Interactions.Lakes, "SurfaceMask")
                     if target then
                         if not hasTeleported then
