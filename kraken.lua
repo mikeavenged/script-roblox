@@ -312,7 +312,7 @@ MainTab:Button({
     Callback = function()
         local char = game.Players.LocalPlayer.Character
         if char and char:FindFirstChild("HumanoidRootPart") then
-            char.HumanoidRootPart.CFrame = CFrame.new(456,510,1701)
+            char.HumanoidRootPart.CFrame = CFrame.new(-1731.7308349609375,582.15966796875,1389.101806640625)
         end
     end
 })
