@@ -295,7 +295,14 @@ Camera.CFrame = CFrame.lookAt(Camera.CFrame.Position, target.Position)
         end)
     end
 end)
-
+MainTab:Button({
+Title = "Copy Position",
+Callback = function()
+local pos = game.Players.LocalPlayer.Character.HumanoidRootPart.Position
+setclipboard("CFrame.new("..pos.X..","..pos.Y..","..pos.Z..")")
+print("Copied Position")
+end
+})
 MainTab:Section({
     Title = "// Teleport Islands"
 })
