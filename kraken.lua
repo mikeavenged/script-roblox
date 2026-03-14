@@ -157,6 +157,11 @@ task.spawn(function()
         pcall(function()
             local myRoot = getMyChar():FindFirstChild("HumanoidRootPart")
             if not myRoot then return end
+                    -- Auto Sniff ทุก 15 วิ
+if tick() - lastSniffTime >= 15 then
+    pressKey(Enum.KeyCode.H)
+    lastSniffTime = tick()
+end
 
             local hud = LocalPlayer.PlayerGui.HUDGui.MissionsFrame.Other
             local qMud = hud:FindFirstChild("ConcealScent")
@@ -229,14 +234,9 @@ task.spawn(function()
                     if target then
                         if not hasTeleported then
                            local lookPos = target.Position
+local direction = (lookPos - myRoot.Position).Unit
+local telePos = lookPos - (direction * 7) + Vector3.new(0,3,0)
 
--- ถอยหลังจากเนื้อ
-local backOffset = target.CFrame.LookVector * -6
-
--- วาปเหนือเนื้อเล็กน้อย + ถอยหลัง
-local telePos = target.Position + backOffset + Vector3.new(0,5,0)
-
--- หันหน้าเข้าเนื้อ
 myRoot.CFrame = CFrame.lookAt(telePos, lookPos)
 Camera.CFrame = CFrame.lookAt(Camera.CFrame.Position, lookPos)
                             hasTeleported = true
