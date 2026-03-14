@@ -296,6 +296,87 @@ Camera.CFrame = CFrame.lookAt(Camera.CFrame.Position, target.Position)
     end
 end)
 
+MainTab:Button({
+Title = "Copy Position",
+Callback = function()
+local pos = game.Players.LocalPlayer.Character.HumanoidRootPart.Position
+setclipboard("CFrame.new("..pos.X..","..pos.Y..","..pos.Z..")")
+print("Copied Position")
+end
+})
+MainTab:Section({
+    Title = "// Teleport Islands"
+})
+MainTab:Button({
+    Title = "Teleport Oasis",
+    Desc = "วาปไปโอเอซิส",
+    Callback = function()
+        local char = game.Players.LocalPlayer.Character
+        if char and char:FindFirstChild("HumanoidRootPart") then
+            char.HumanoidRootPart.CFrame = CFrame.new(-1295.0789794921875,292.3437194824219,787.1272583007812)
+        end
+    end
+})
+MainTab:Button({
+Title = "Teleport ภูเขาไฟ",
+Desc = "วาปไปภูเขาไฟ",
+Callback = function()
+local char = game.Players.LocalPlayer.Character
+if char and char:FindFirstChild("HumanoidRootPart") then
+char.HumanoidRootPart.CFrame = CFrame.new(2122,398,850)
+end
+end
+})
+MainTab:Button({
+Title = "Teleport หน้าผากลาง",
+Desc = "วาปไปหน้าผากลาง",
+Callback = function()
+local char = game.Players.LocalPlayer.Character
+if char and char:FindFirstChild("HumanoidRootPart") then
+char.HumanoidRootPart.CFrame = CFrame.new(8.342073440551758,254.5718536376953,-105.14787292480469)
+end
+end
+})
+MainTab:Button({
+Title = "Teleport ป่าดงดิบ",
+Desc = "วาปไปป่าดงดิบ",
+Callback = function()
+local char = game.Players.LocalPlayer.Character
+if char and char:FindFirstChild("HumanoidRootPart") then
+char.HumanoidRootPart.CFrame = CFrame.new(2000.1488037109375,211.26702880859375,-705.1337280273438)
+end
+end
+})
+MainTab:Button({
+Title = "Teleport หิมะ",
+Desc = "วาปไปหิมะ",
+Callback = function()
+local char = game.Players.LocalPlayer.Character
+if char and char:FindFirstChild("HumanoidRootPart") then
+char.HumanoidRootPart.CFrame = CFrame.new(-1666,659,-1132)
+end
+end
+})
+MainTab:Button({
+Title = "Teleport บึงกลวง",
+Desc = "วาปไปบึงกลวง",
+Callback = function()
+local char = game.Players.LocalPlayer.Character
+if char and char:FindFirstChild("HumanoidRootPart") then
+char.HumanoidRootPart.CFrame = CFrame.new(731.9264526367188,185.1005096435547,-2609.9677734375)
+end
+end
+})
+MainTab:Button({
+Title = "Teleport ชายฝั่งที่ลืม",
+Desc = "วาปไปชายฝั่งที่ลืม",
+Callback = function()
+local char = game.Players.LocalPlayer.Character
+if char and char:FindFirstChild("HumanoidRootPart") then
+char.HumanoidRootPart.CFrame = CFrame.new(-1626.9925537109375,240.81964111328125,2460.16845703125)
+end
+end
+})
 local AutoFarmToggle = MainTab:Toggle({
     Title = "Auto Farm ",
     Desc = "ฟาร์มโหดๆ555 ",
