@@ -419,34 +419,53 @@ refreshPlayers()
 game.Players.PlayerAdded:Connect(refreshPlayers)
 game.Players.PlayerRemoving:Connect(refreshPlayers)
 
+_G.KillPlayer = false
 
-MainTab:Button({
+MainTab:Toggle({
     Title = "Kill Selected Player",
-    Desc = "วาปไปตีจนตาย",
-    Callback = function()
+    Desc = "เปิด / ปิด ไล่ฆ่าคนที่เลือก",
+    Default = false,
+    Callback = function(Value)
+        _G.KillPlayer = Value
+    end
+})
 
-        if not SelectedPlayer then return end
+task.spawn(function()
+    while true do
+        task.wait(0.1)
+
+        if not _G.KillPlayer then
+            continue
+        end
+
+        if not SelectedPlayer then
+            continue
+        end
         
         local target = game.Players:FindFirstChild(SelectedPlayer)
-        if not target then return end
+        if not target then
+            continue
+        end
         
         local myChar = game.Players.LocalPlayer.Character
-        local enemyChar = workspace.Characters:FindFirstChild(target.Name)
+        local enemyChar = target.Character
         
-        if not myChar or not enemyChar then return end
+        if not myChar or not enemyChar then
+            continue
+        end
         
         local myRoot = myChar:FindFirstChild("HumanoidRootPart")
         local enemyRoot = enemyChar:FindFirstChild("HumanoidRootPart")
         
-        if not myRoot or not enemyRoot then return end
-        
-        -- ตีรัว
-        for i = 1,120 do
-            myRoot.CFrame = enemyRoot.CFrame * CFrame.new(0,0,2)
-            VirtualInputManager:SendMouseButtonEvent(0,0,0,true,game,0)
-            task.wait(0.05)
-            VirtualInputManager:SendMouseButtonEvent(0,0,0,false,game,0)
+        if not myRoot or not enemyRoot then
+            continue
         end
-        
+
+        myRoot.CFrame = enemyRoot.CFrame * CFrame.new(0,0,2)
+
+        VirtualInputManager:SendMouseButtonEvent(0,0,0,true,game,0)
+        task.wait(0.05)
+        VirtualInputManager:SendMouseButtonEvent(0,0,0,false,game,0)
+
     end
-})
+end)
