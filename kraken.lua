@@ -420,6 +420,7 @@ game.Players.PlayerAdded:Connect(refreshPlayers)
 game.Players.PlayerRemoving:Connect(refreshPlayers)
 
 _G.KillPlayer = false
+local KillLoopRunning = false
 
 MainTab:Toggle({
     Title = "Kill Selected Player",
@@ -431,9 +432,11 @@ MainTab:Toggle({
 })
 
 task.spawn(function()
-    while true do
-        task.wait(0.1)
+    if KillLoopRunning then return end
+    KillLoopRunning = true
 
+    while task.wait(0.1) do
+        
         if not _G.KillPlayer then
             continue
         end
@@ -458,6 +461,11 @@ task.spawn(function()
         local enemyRoot = enemyChar:FindFirstChild("HumanoidRootPart")
         
         if not myRoot or not enemyRoot then
+            continue
+        end
+
+        -- เช็คอีกครั้งก่อนตี
+        if not _G.KillPlayer then
             continue
         end
 
