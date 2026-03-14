@@ -69,18 +69,6 @@ local LocalPlayer = Players.LocalPlayer
 local Workspace = game:GetService("Workspace")
 local Camera = Workspace.CurrentCamera
 
-local function getHungerPercent()
-    local hud = LocalPlayer.PlayerGui:FindFirstChild("HUDGui")
-    if not hud then return 0 end
-    
-    local hungerBar = hud:FindFirstChild("HungerBar", true)
-    if hungerBar and hungerBar:FindFirstChild("Fill") then
-        return hungerBar.Fill.Size.X.Scale * 100
-    end
-    
-    return 0
-end
-
 local function pressKey(keyCode)
     VirtualInputManager:SendKeyEvent(true, keyCode, false, game)
     task.wait(0.25)
@@ -103,10 +91,6 @@ local foodMode = "Water"
 local idleIndex = 1
 local lastIdleTime = 0
 local lastPosBeforeAttack = nil
-
-local sniffCooldown = 15
-local lastSniffTime = 0
-local forceEat = false
 
 local idleCFrames = {
     CFrame.new(393.017365, 571.791687, -5.18445492, 0.0557625704, 6.04802486e-10, 0.99844408, -1.52293855e-11, 1, -6.04894468e-10, -0.99844408, 1.85247807e-11, 0.0557625704),
@@ -173,23 +157,6 @@ task.spawn(function()
             local myRoot = getMyChar():FindFirstChild("HumanoidRootPart")
             if not myRoot then return end
 
-                    local hunger = getHungerPercent()
-
-if hunger <= 2 then
-    forceEat = true
-elseif hunger >= 98 then
-    forceEat = false
-end
-                    if forceEat then
-    currentTask = "Drink"
-end
-                    
-                    -- Auto Sniff cooldown
-if tick() - lastSniffTime >= sniffCooldown then
-    pressKey(Enum.KeyCode.H)
-    lastSniffTime = tick()
-end
-
             local hud = LocalPlayer.PlayerGui.HUDGui.MissionsFrame.Other
             local qMud = hud:FindFirstChild("ConcealScent")
             local qDrink = hud:FindFirstChild("EatFoodDrinkWater")
@@ -208,7 +175,7 @@ end
                 currentTask = nil 
             end
             
-            if currentTask == nil and not forceEat then
+            if currentTask == nil then
                 local taskPool = {}
                 if qMud and qMud.Visible then table.insert(taskPool, "Mud") end
                 if qDrink and qDrink.Visible then table.insert(taskPool, "Drink") end
@@ -241,17 +208,17 @@ end
                     end
                     pressKey(Enum.KeyCode.E)
                 end
-            elseif currentTask == "Drink" or forceEat then
-                if not forceEat and tick() - foodToggleTime >= 10 then
+            elseif currentTask == "Drink" then
+                if tick() - foodToggleTime >= 10 then
                     foodToggleTime = tick()
                     foodMode = (foodMode == "Water") and "Food" or "Water"
                     hasTeleported = false
                 end
-                if foodMode == "Water" and not forceEat then
+                if foodMode == "Water" then
                     local target = getClosest(Workspace.Interactions.Lakes, "SurfaceMask")
                     if target then
                         if not hasTeleported then
-                            myRoot.CFrame = target.CFrame * CFrame.new(0, 2, 0)
+                            myRoot.CFrame = target.CFrame * CFrame.new(0, 40, 0)
                             hasTeleported = true
                         end
                         pressKey(Enum.KeyCode.E)
@@ -260,21 +227,17 @@ end
                     local target = getClosestPart(Workspace.Interactions.Food, "Ribs", "Food")
                     if target then
                         if not hasTeleported then
-                            local dir = (target.Position - myRoot.Position).Unit
-local telePos = target.Position - dir * 4 + Vector3.new(0,2,0)
-
-myRoot.CFrame = CFrame.lookAt(telePos, target.Position)
-Camera.CFrame = CFrame.lookAt(Camera.CFrame.Position, target.Position)
+                            local lookPos = target.Position
+                            local telePos = target.Position + Vector3.new(0, 40, 0)
+                            myRoot.CFrame = CFrame.lookAt(telePos, lookPos)
+                            Camera.CFrame = CFrame.lookAt(Camera.CFrame.Position, lookPos)
                             hasTeleported = true
                         end
                         pressKey(Enum.KeyCode.E)
                     end
                 end
             elseif currentTask == "Sniff" then
-    if tick() - lastSniffTime >= sniffCooldown then
-        pressKey(Enum.KeyCode.H)
-        lastSniffTime = tick()
-    end
+                pressKey(Enum.KeyCode.H)
             elseif currentTask == "Attack" then
                 local chars = Workspace.Characters:GetChildren()
                 local enemy = nil
@@ -296,87 +259,6 @@ Camera.CFrame = CFrame.lookAt(Camera.CFrame.Position, target.Position)
     end
 end)
 
-MainTab:Button({
-Title = "Copy Position",
-Callback = function()
-local pos = game.Players.LocalPlayer.Character.HumanoidRootPart.Position
-setclipboard("CFrame.new("..pos.X..","..pos.Y..","..pos.Z..")")
-print("Copied Position")
-end
-})
-MainTab:Section({
-    Title = "// Teleport Islands"
-})
-MainTab:Button({
-    Title = "Teleport Oasis",
-    Desc = "วาปไปโอเอซิส",
-    Callback = function()
-        local char = game.Players.LocalPlayer.Character
-        if char and char:FindFirstChild("HumanoidRootPart") then
-            char.HumanoidRootPart.CFrame = CFrame.new(-1295.0789794921875,292.3437194824219,787.1272583007812)
-        end
-    end
-})
-MainTab:Button({
-Title = "Teleport ภูเขาไฟ",
-Desc = "วาปไปภูเขาไฟ",
-Callback = function()
-local char = game.Players.LocalPlayer.Character
-if char and char:FindFirstChild("HumanoidRootPart") then
-char.HumanoidRootPart.CFrame = CFrame.new(2122,398,850)
-end
-end
-})
-MainTab:Button({
-Title = "Teleport หน้าผากลาง",
-Desc = "วาปไปหน้าผากลาง",
-Callback = function()
-local char = game.Players.LocalPlayer.Character
-if char and char:FindFirstChild("HumanoidRootPart") then
-char.HumanoidRootPart.CFrame = CFrame.new(8.342073440551758,254.5718536376953,-105.14787292480469)
-end
-end
-})
-MainTab:Button({
-Title = "Teleport ป่าดงดิบ",
-Desc = "วาปไปป่าดงดิบ",
-Callback = function()
-local char = game.Players.LocalPlayer.Character
-if char and char:FindFirstChild("HumanoidRootPart") then
-char.HumanoidRootPart.CFrame = CFrame.new(2000.1488037109375,211.26702880859375,-705.1337280273438)
-end
-end
-})
-MainTab:Button({
-Title = "Teleport หิมะ",
-Desc = "วาปไปหิมะ",
-Callback = function()
-local char = game.Players.LocalPlayer.Character
-if char and char:FindFirstChild("HumanoidRootPart") then
-char.HumanoidRootPart.CFrame = CFrame.new(-1666,659,-1132)
-end
-end
-})
-MainTab:Button({
-Title = "Teleport บึงกลวง",
-Desc = "วาปไปบึงกลวง",
-Callback = function()
-local char = game.Players.LocalPlayer.Character
-if char and char:FindFirstChild("HumanoidRootPart") then
-char.HumanoidRootPart.CFrame = CFrame.new(731.9264526367188,185.1005096435547,-2609.9677734375)
-end
-end
-})
-MainTab:Button({
-Title = "Teleport ชายฝั่งที่ลืม",
-Desc = "วาปไปชายฝั่งที่ลืม",
-Callback = function()
-local char = game.Players.LocalPlayer.Character
-if char and char:FindFirstChild("HumanoidRootPart") then
-char.HumanoidRootPart.CFrame = CFrame.new(-1626.9925537109375,240.81964111328125,2460.16845703125)
-end
-end
-})
 local AutoFarmToggle = MainTab:Toggle({
     Title = "Auto Farm ",
     Desc = "ฟาร์มโหดๆ555 ",
@@ -390,53 +272,3 @@ local AutoFarmToggle = MainTab:Toggle({
         end
     end
 })
-_G.KillPlayer = false
-
-MainTab:Toggle({
-    Title = "Kill Selected Player",
-    Desc = "เปิด / ปิด ไล่ฆ่าคนที่เลือก",
-    Default = false,
-    Callback = function(Value)
-        _G.KillPlayer = Value
-    end
-})
-
-task.spawn(function()
-    while true do
-        task.wait(0.1)
-
-        if not _G.KillPlayer then
-            continue
-        end
-
-        if not SelectedPlayer then
-            continue
-        end
-        
-        local target = game.Players:FindFirstChild(SelectedPlayer)
-        if not target then
-            continue
-        end
-        
-        local myChar = game.Players.LocalPlayer.Character
-        local enemyChar = target.Character
-        
-        if not myChar or not enemyChar then
-            continue
-        end
-        
-        local myRoot = myChar:FindFirstChild("HumanoidRootPart")
-        local enemyRoot = enemyChar:FindFirstChild("HumanoidRootPart")
-        
-        if not myRoot or not enemyRoot then
-            continue
-        end
-
-        myRoot.CFrame = enemyRoot.CFrame * CFrame.new(0,0,2)
-
-        VirtualInputManager:SendMouseButtonEvent(0,0,0,true,game,0)
-        task.wait(0.05)
-        VirtualInputManager:SendMouseButtonEvent(0,0,0,false,game,0)
-
-    end
-end)
