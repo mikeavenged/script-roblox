@@ -69,6 +69,10 @@ local LocalPlayer = Players.LocalPlayer
 local Workspace = game:GetService("Workspace")
 local Camera = Workspace.CurrentCamera
 
+local function getMyChar()
+    return Workspace.Characters:FindFirstChild(LocalPlayer.Name) or LocalPlayer.Character
+end
+
 local function pressKey(keyCode)
     VirtualInputManager:SendKeyEvent(true, keyCode, false, game)
     task.wait(0.25)
@@ -82,6 +86,22 @@ local function clickMouse()
     VirtualInputManager:SendMouseButtonEvent(0, 0, 0, false, game, 0)
     task.wait(0.25)
 end
+
+task.spawn(function()
+    while task.wait(1) do
+        for _,char in pairs(Workspace.Characters:GetChildren()) do
+            if char ~= getMyChar() then
+                local root = char:FindFirstChild("HumanoidRootPart")
+                if root then
+                    root.Size = Vector3.new(20,20,20)
+                    root.Transparency = 0.5
+                    root.CanCollide = false
+                end
+            end
+        end
+    end
+end)
+
 local radius = 60
 
 task.spawn(function()
@@ -140,9 +160,6 @@ local idleCFrames = {
     CFrame.new(-681.817078, 75.0634308, -3028.96777, -0.980617046, 0.0334055759, -0.193065256, 0.0298160873, 0.999324799, 0.0214686729, 0.193652064, 0.0152960978, -0.980951071)
 }
 
-local function getMyChar()
-    return Workspace.Characters:FindFirstChild(LocalPlayer.Name) or LocalPlayer.Character
-end
 
 local function getClosestPart(parentFolder, modelName, partName)
     local closest = nil
