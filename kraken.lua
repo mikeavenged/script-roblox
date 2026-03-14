@@ -259,6 +259,87 @@ task.spawn(function()
     end
 end)
 
+MainTab:Button({
+Title = "Copy Position",
+Callback = function()
+local pos = game.Players.LocalPlayer.Character.HumanoidRootPart.Position
+setclipboard("CFrame.new("..pos.X..","..pos.Y..","..pos.Z..")")
+print("Copied Position")
+end
+})
+MainTab:Section({
+    Title = "// Teleport Islands"
+})
+MainTab:Button({
+    Title = "Teleport Oasis",
+    Desc = "วาปไปโอเอซิส",
+    Callback = function()
+        local char = game.Players.LocalPlayer.Character
+        if char and char:FindFirstChild("HumanoidRootPart") then
+            char.HumanoidRootPart.CFrame = CFrame.new(-1295.0789794921875,292.3437194824219,787.1272583007812)
+        end
+    end
+})
+MainTab:Button({
+Title = "Teleport ภูเขาไฟ",
+Desc = "วาปไปภูเขาไฟ",
+Callback = function()
+local char = game.Players.LocalPlayer.Character
+if char and char:FindFirstChild("HumanoidRootPart") then
+char.HumanoidRootPart.CFrame = CFrame.new(2122,398,850)
+end
+end
+})
+MainTab:Button({
+Title = "Teleport หน้าผากลาง",
+Desc = "วาปไปหน้าผากลาง",
+Callback = function()
+local char = game.Players.LocalPlayer.Character
+if char and char:FindFirstChild("HumanoidRootPart") then
+char.HumanoidRootPart.CFrame = CFrame.new(8.342073440551758,254.5718536376953,-105.14787292480469)
+end
+end
+})
+MainTab:Button({
+Title = "Teleport ป่าดงดิบ",
+Desc = "วาปไปป่าดงดิบ",
+Callback = function()
+local char = game.Players.LocalPlayer.Character
+if char and char:FindFirstChild("HumanoidRootPart") then
+char.HumanoidRootPart.CFrame = CFrame.new(2000.1488037109375,211.26702880859375,-705.1337280273438)
+end
+end
+})
+MainTab:Button({
+Title = "Teleport หิมะ",
+Desc = "วาปไปหิมะ",
+Callback = function()
+local char = game.Players.LocalPlayer.Character
+if char and char:FindFirstChild("HumanoidRootPart") then
+char.HumanoidRootPart.CFrame = CFrame.new(-1666,659,-1132)
+end
+end
+})
+MainTab:Button({
+Title = "Teleport บึงกลวง",
+Desc = "วาปไปบึงกลวง",
+Callback = function()
+local char = game.Players.LocalPlayer.Character
+if char and char:FindFirstChild("HumanoidRootPart") then
+char.HumanoidRootPart.CFrame = CFrame.new(731.9264526367188,185.1005096435547,-2609.9677734375)
+end
+end
+})
+MainTab:Button({
+Title = "Teleport ชายฝั่งที่ลืม",
+Desc = "วาปไปชายฝั่งที่ลืม",
+Callback = function()
+local char = game.Players.LocalPlayer.Character
+if char and char:FindFirstChild("HumanoidRootPart") then
+char.HumanoidRootPart.CFrame = CFrame.new(-1626.9925537109375,240.81964111328125,2460.16845703125)
+end
+end
+})
 local AutoFarmToggle = MainTab:Toggle({
     Title = "Auto Farm ",
     Desc = "ฟาร์มโหดๆ555 ",
@@ -272,3 +353,70 @@ local AutoFarmToggle = MainTab:Toggle({
         end
     end
 })
+local SelectedPlayer = nil
+
+MainTab:Dropdown({
+    Title = "Select Player",
+    Values = (function()
+        local t = {}
+        for _,v in pairs(game.Players:GetPlayers()) do
+            if v ~= game.Players.LocalPlayer then
+                table.insert(t,v.Name)
+            end
+        end
+        return t
+    end)(),
+    Callback = function(v)
+        SelectedPlayer = v
+    end
+})
+_G.KillPlayer = false
+
+MainTab:Toggle({
+    Title = "Kill Selected Player",
+    Desc = "เปิด / ปิด ไล่ฆ่าคนที่เลือก",
+    Default = false,
+    Callback = function(Value)
+        _G.KillPlayer = Value
+    end
+})
+
+task.spawn(function()
+    while true do
+        task.wait(0.1)
+
+        if not _G.KillPlayer then
+            continue
+        end
+
+        if not SelectedPlayer then
+            continue
+        end
+        
+        local target = game.Players:FindFirstChild(SelectedPlayer)
+        if not target then
+            continue
+        end
+        
+        local myChar = game.Players.LocalPlayer.Character
+        local enemyChar = target.Character
+        
+        if not myChar or not enemyChar then
+            continue
+        end
+        
+        local myRoot = myChar:FindFirstChild("HumanoidRootPart")
+        local enemyRoot = enemyChar:FindFirstChild("HumanoidRootPart")
+        
+        if not myRoot or not enemyRoot then
+            continue
+        end
+
+        myRoot.CFrame = enemyRoot.CFrame * CFrame.new(0,0,2)
+
+        VirtualInputManager:SendMouseButtonEvent(0,0,0,true,game,0)
+        task.wait(0.05)
+        VirtualInputManager:SendMouseButtonEvent(0,0,0,false,game,0)
+
+    end
+end)
