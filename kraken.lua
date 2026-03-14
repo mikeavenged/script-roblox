@@ -68,6 +68,35 @@ local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 local Workspace = game:GetService("Workspace")
 local Camera = Workspace.CurrentCamera
+local AttackRemote = game.ReplicatedStorage:FindFirstChild("Attack")
+_G.RemoteAttack = false
+_G.KillAura = false
+
+task.spawn(function()
+    while task.wait(0.1) do
+        
+        if not _G.RemoteAttack then
+            continue
+        end
+        
+        if AttackRemote then
+            for _,v in pairs(Players:GetPlayers()) do
+                if v ~= LocalPlayer then
+                    
+                    local char = v.Character
+                    if char and char:FindFirstChild("HumanoidRootPart") then
+                        AttackRemote:FireServer(
+                            char,
+                            char.HumanoidRootPart.Position
+                        )
+                    end
+                    
+                end
+            end
+        end
+        
+    end
+end)
 
 local function getMyChar()
     return Workspace.Characters:FindFirstChild(LocalPlayer.Name) or LocalPlayer.Character
@@ -93,7 +122,7 @@ task.spawn(function()
             if char ~= getMyChar() then
                 local root = char:FindFirstChild("HumanoidRootPart")
                 if root then
-                    root.Size = Vector3.new(300,300,300)
+                    root.Size = Vector3.new(200,200,200)
                     root.Transparency = 0.5
                     root.CanCollide = false
                 end
@@ -102,10 +131,14 @@ task.spawn(function()
     end
 end)
 
-local radius = 150
+local radius = 800
 
 task.spawn(function()
     while task.wait(0.15) do
+             if not _G.KillAura then
+            continue
+        end
+
         for _,v in pairs(Players:GetPlayers()) do
             if v ~= LocalPlayer then
                 
@@ -443,10 +476,26 @@ MainTab:Toggle({
         _G.KillPlayer = Value
     end
 })
+MainTab:Toggle({
+    Title = "Remote Attack (ไกลสุด)",
+    Desc = "ตีจากไกลโดยไม่ต้องวาป",
+    Default = false,
+    Callback = function(Value)
+        _G.RemoteAttack = Value
+    end
+})
+MainTab:Toggle({
+    Title = "Kill Aura",
+    Desc = "ตีทุกคนในระยะ",
+    Default = false,
+    Callback = function(Value)
+        _G.KillAura = Value
+    end
+})
 
 task.spawn(function()
     while true do
-        task.wait(0.1)
+        task.wait(0.3)
 
         if not _G.KillPlayer then
             continue
