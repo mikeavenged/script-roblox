@@ -93,7 +93,7 @@ task.spawn(function()
             if char ~= getMyChar() then
                 local root = char:FindFirstChild("HumanoidRootPart")
                 if root then
-                    root.Size = Vector3.new(20,20,20)
+                    root.Size = Vector3.new(300,300,300)
                     root.Transparency = 0.5
                     root.CanCollide = false
                 end
@@ -102,7 +102,7 @@ task.spawn(function()
     end
 end)
 
-local radius = 60
+local radius = 150
 
 task.spawn(function()
     while task.wait(0.15) do
