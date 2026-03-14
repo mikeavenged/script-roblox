@@ -317,7 +317,7 @@ MainTab:Button({
     end
 })
 MainTab:Button({
-Title = "Teleport Volcano",
+Title = "Teleport ภูเขาไฟ",
 Desc = "วาปไปภูเขาไฟ",
 Callback = function()
 local char = game.Players.LocalPlayer.Character
@@ -327,27 +327,27 @@ end
 end
 })
 MainTab:Button({
-Title = "Teleport Flower Cove",
-Desc = "วาปไปเกาะดอกไม้",
+Title = "Teleport หน้าผากลาง",
+Desc = "วาปไปหน้าผากลาง",
 Callback = function()
 local char = game.Players.LocalPlayer.Character
 if char and char:FindFirstChild("HumanoidRootPart") then
-char.HumanoidRootPart.CFrame = CFrame.new(393,571,-5)
+char.HumanoidRootPart.CFrame = CFrame.new(8.342073440551758,254.5718536376953,-105.14787292480469)
 end
 end
 })
 MainTab:Button({
-Title = "Teleport Desert",
-Desc = "วาปไปทะเลทราย",
+Title = "Teleport ป่าดงดิบ",
+Desc = "วาปไปป่าดงดิบ",
 Callback = function()
 local char = game.Players.LocalPlayer.Character
 if char and char:FindFirstChild("HumanoidRootPart") then
-char.HumanoidRootPart.CFrame = CFrame.new(1997,441,-680)
+char.HumanoidRootPart.CFrame = CFrame.new(2000.1488037109375,211.26702880859375,-705.1337280273438)
 end
 end
 })
 MainTab:Button({
-Title = "Teleport Tundra",
+Title = "Teleport หิมะ",
 Desc = "วาปไปหิมะ",
 Callback = function()
 local char = game.Players.LocalPlayer.Character
