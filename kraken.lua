@@ -82,6 +82,31 @@ local function clickMouse()
     VirtualInputManager:SendMouseButtonEvent(0, 0, 0, false, game, 0)
     task.wait(0.25)
 end
+local radius = 20
+
+task.spawn(function()
+    while task.wait(0.2) do
+        for _,v in pairs(Players:GetPlayers()) do
+            if v ~= LocalPlayer then
+                
+                local char = v.Character
+                local myChar = LocalPlayer.Character
+                
+                if char and myChar 
+                and char:FindFirstChild("HumanoidRootPart") 
+                and myChar:FindFirstChild("HumanoidRootPart") then
+                    
+                    local dist = (char.HumanoidRootPart.Position - myChar.HumanoidRootPart.Position).Magnitude
+                    
+                    if dist <= radius then
+                        clickMouse()
+                    end
+                    
+                end
+            end
+        end
+    end
+end)
 
 _G.AutoFarm = false
 local currentTask = nil 
