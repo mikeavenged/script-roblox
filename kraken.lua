@@ -390,6 +390,48 @@ local AutoFarmToggle = MainTab:Toggle({
     end
 })
 MainTab:Section({
+    Title = "// Speed Hack"
+})
+
+_G.SpeedHack = false
+_G.SpeedPower = 5
+
+MainTab:Toggle({
+    Title = "Speed Hack",
+    Desc = "วิ่งเร็วขึ้น",
+    Default = false,
+    Callback = function(Value)
+        _G.SpeedHack = Value
+    end
+})
+
+MainTab:Slider({
+    Title = "Speed Power",
+    Step = 1,
+    Value = {
+        Min = 1,
+        Max = 20,
+        Default = 5
+    },
+    Callback = function(Value)
+        _G.SpeedPower = Value
+    end
+})
+
+task.spawn(function()
+    while true do
+        task.wait(0.05)
+
+        if _G.SpeedHack then
+            local char = game.Players.LocalPlayer.Character
+            if char and char:FindFirstChild("HumanoidRootPart") then
+                local root = char.HumanoidRootPart
+                root.CFrame = root.CFrame + (root.CFrame.LookVector * _G.SpeedPower)
+            end
+        end
+    end
+end)
+MainTab:Section({
     Title = "// Kill Player"
 })
 
@@ -402,6 +444,7 @@ local PlayerDropdown = MainTab:Dropdown({
         SelectedPlayer = Value
     end
 })
+
 
 -- อัพเดทรายชื่อผู้เล่น
 local function refreshPlayers()
