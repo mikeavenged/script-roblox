@@ -175,12 +175,12 @@ task.spawn(function()
 
                     local hunger = getHungerPercent()
 
-if hunger <= 30 then
+if hunger <= 2 then
     forceEat = true
 elseif hunger >= 98 then
     forceEat = false
 end
-if forceEat and currentTask == nil then
+                    if forceEat then
     currentTask = "Drink"
 end
                     
@@ -241,36 +241,35 @@ end
                     end
                     pressKey(Enum.KeyCode.E)
                 end
-        elseif currentTask == "Drink" then
+            elseif currentTask == "Drink" or forceEat then
+                if not forceEat and tick() - foodToggleTime >= 10 then
+                    foodToggleTime = tick()
+                    foodMode = (foodMode == "Water") and "Food" or "Water"
+                    hasTeleported = false
+                end
+                if foodMode == "Water" and not forceEat then
+                    local target = getClosest(Workspace.Interactions.Lakes, "SurfaceMask")
+                    if target then
+                        if not hasTeleported then
+                            myRoot.CFrame = target.CFrame * CFrame.new(0, 2, 0)
+                            hasTeleported = true
+                        end
+                        pressKey(Enum.KeyCode.E)
+                    end
+                else
+                    local target = getClosestPart(Workspace.Interactions.Food, "Ribs", "Food")
+                    if target then
+                        if not hasTeleported then
+                            local dir = (target.Position - myRoot.Position).Unit
+local telePos = target.Position - dir * 4 + Vector3.new(0,2,0)
 
-    local target = nil
-
-    -- ถ้าหิวมากให้หาอาหารก่อน
-    if forceEat then
-        target = getClosestPart(Workspace.Interactions.Food, "Ribs", "Food")
-    else
-        -- สลับน้ำกับอาหาร
-        if tick() - foodToggleTime >= 10 then
-            foodToggleTime = tick()
-            foodMode = (foodMode == "Water") and "Food" or "Water"
-            hasTeleported = false
-        end
-
-        if foodMode == "Water" then
-            target = getClosest(Workspace.Interactions.Lakes, "SurfaceMask")
-        else
-            target = getClosestPart(Workspace.Interactions.Food, "Ribs", "Food")
-        end
-    end
-
-    if target then
-        if not hasTeleported then
-            myRoot.CFrame = target.CFrame * CFrame.new(0,3,0)
-            hasTeleported = true
-        end
-        pressKey(Enum.KeyCode.E)
-    end
-
+myRoot.CFrame = CFrame.lookAt(telePos, target.Position)
+Camera.CFrame = CFrame.lookAt(Camera.CFrame.Position, target.Position)
+                            hasTeleported = true
+                        end
+                        pressKey(Enum.KeyCode.E)
+                    end
+                end
             elseif currentTask == "Sniff" then
     if tick() - lastSniffTime >= sniffCooldown then
         pressKey(Enum.KeyCode.H)
@@ -421,7 +420,6 @@ game.Players.PlayerAdded:Connect(refreshPlayers)
 game.Players.PlayerRemoving:Connect(refreshPlayers)
 
 _G.KillPlayer = false
-local KillLoopRunning = false
 
 MainTab:Toggle({
     Title = "Kill Selected Player",
@@ -433,11 +431,9 @@ MainTab:Toggle({
 })
 
 task.spawn(function()
-    if KillLoopRunning then return end
-    KillLoopRunning = true
+    while true do
+        task.wait(0.1)
 
-    while task.wait(0.1) do
-        
         if not _G.KillPlayer then
             continue
         end
@@ -462,11 +458,6 @@ task.spawn(function()
         local enemyRoot = enemyChar:FindFirstChild("HumanoidRootPart")
         
         if not myRoot or not enemyRoot then
-            continue
-        end
-
-        -- เช็คอีกครั้งก่อนตี
-        if not _G.KillPlayer then
             continue
         end
 
