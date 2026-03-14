@@ -389,3 +389,64 @@ local AutoFarmToggle = MainTab:Toggle({
         end
     end
 })
+MainTab:Section({
+    Title = "// Kill Player"
+})
+
+local SelectedPlayer = nil
+
+local PlayerDropdown = MainTab:Dropdown({
+    Title = "Select Player",
+    Values = {},
+    Callback = function(Value)
+        SelectedPlayer = Value
+    end
+})
+
+-- อัพเดทรายชื่อผู้เล่น
+local function refreshPlayers()
+    local list = {}
+    for _,plr in pairs(game.Players:GetPlayers()) do
+        if plr ~= game.Players.LocalPlayer then
+            table.insert(list, plr.Name)
+        end
+    end
+    PlayerDropdown:Refresh(list)
+end
+
+refreshPlayers()
+
+game.Players.PlayerAdded:Connect(refreshPlayers)
+game.Players.PlayerRemoving:Connect(refreshPlayers)
+
+
+MainTab:Button({
+    Title = "Kill Selected Player",
+    Desc = "วาปไปตีจนตาย",
+    Callback = function()
+
+        if not SelectedPlayer then return end
+        
+        local target = game.Players:FindFirstChild(SelectedPlayer)
+        if not target then return end
+        
+        local myChar = game.Players.LocalPlayer.Character
+        local enemyChar = workspace.Characters:FindFirstChild(target.Name)
+        
+        if not myChar or not enemyChar then return end
+        
+        local myRoot = myChar:FindFirstChild("HumanoidRootPart")
+        local enemyRoot = enemyChar:FindFirstChild("HumanoidRootPart")
+        
+        if not myRoot or not enemyRoot then return end
+        
+        -- ตีรัว
+        for i = 1,120 do
+            myRoot.CFrame = enemyRoot.CFrame * CFrame.new(0,0,2)
+            VirtualInputManager:SendMouseButtonEvent(0,0,0,true,game,0)
+            task.wait(0.05)
+            VirtualInputManager:SendMouseButtonEvent(0,0,0,false,game,0)
+        end
+        
+    end
+})
