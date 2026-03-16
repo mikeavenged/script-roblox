@@ -594,29 +594,29 @@ local function getTokens()
     
     return tokens
 end
-local shoomIndex = 1
-local shoomList = {}
+local ShoomRemote = game.ReplicatedStorage.Remotes:FindFirstChild("ShoomPileCollected")
 
-local function updateShooms()
-    shoomList = {}
-
-    for _,v in pairs(workspace:GetDescendants()) do
+task.spawn(function()
+    while task.wait(0.3) do
         
-        if v.Name == "Red Shoom Pile"
-        or v.Name == "Silver Shoom Pile"
-        or v.Name == "Gold Shoom Pile" then
+        if not _G.AutoShoom then
+            continue
+        end
+        
+        for _,v in pairs(workspace:GetDescendants()) do
             
-            if v:IsA("Model") then
-                table.insert(shoomList, v)
-            elseif v:IsA("BasePart") then
-                table.insert(shoomList, v)
+            if string.find(v.Name:lower(),"shoom") then
+                
+                if ShoomRemote then
+                    ShoomRemote:FireServer(v)
+                end
+                
             end
             
         end
         
     end
-    
-end
+end)
 MainTab:Toggle({
     Title = "Auto Shoom Farm",
     Desc = "วาปเก็บ Shoom อัตโนมัติ",
