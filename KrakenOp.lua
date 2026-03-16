@@ -574,27 +574,16 @@ local function updateShooms()
     
 end
 MainTab:Button({
-    Title = "Next Shoom",
-    Desc = "Teleport to Shoom",
+    Title = "Collect Shoom",
+    Desc = "Collect Shoom Remote",
     Callback = function()
 
-        local player = game.Players.LocalPlayer
-        local char = player.Character
-        if not char then return end
-        
-        local root = char:FindFirstChild("HumanoidRootPart")
-        if not root then return end
+        local remote = game.ReplicatedStorage.Remotes:FindFirstChild("ShoomPileCollected")
 
-        for _,v in pairs(workspace:GetDescendants()) do
-            if v.Name == "ShoomPiles" then
-                
-                local part = v:FindFirstChildWhichIsA("BasePart", true)
-                
-                if part then
-                    root.CFrame = part.CFrame + Vector3.new(0,5,0)
-                    task.wait(0.8)
-                end
-                
+        if remote then
+            for i = 1,50 do
+                remote:FireServer()
+                task.wait(0.1)
             end
         end
 
