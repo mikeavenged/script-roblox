@@ -72,6 +72,23 @@ local AttackRemote = game.ReplicatedStorage:FindFirstChild("Attack")
 _G.RemoteAttack = false
 _G.KillAura = false
 _G.PlayerESP = false
+_G.GodMode = false
+task.spawn(function()
+    while task.wait(1) do
+        if _G.GodMode then
+            local char = game.Players.LocalPlayer.Character
+            if char then
+                local hum = char:FindFirstChildOfClass("Humanoid")
+                if hum then
+                    for _,v in pairs(getconnections(hum.HealthChanged)) do
+                        v:Disable()
+                    end
+                end
+            end
+        end
+    end
+end)
+
 
 local function createESP(player)
     if player == LocalPlayer then return end
@@ -547,6 +564,14 @@ MainTab:Toggle({
     Default = false,
     Callback = function(Value)
         _G.KillAura = Value
+    end
+})
+MainTab:Toggle({
+    Title = "God Mode",
+    Desc = "อมตะ ไม่โดนดาเมจ",
+    Default = false,
+    Callback = function(Value)
+        _G.GodMode = Value
     end
 })
 
