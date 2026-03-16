@@ -576,20 +576,28 @@ local function getTokens()
     
     return tokens
 end
-local function getClosestRedMushroom()
+local function getClosestMoneyMushroom()
+
     local closest = nil
     local dist = math.huge
-
+    
     local char = game.Players.LocalPlayer.Character
     if not char then return nil end
-
+    
     local root = char:FindFirstChild("HumanoidRootPart")
     if not root then return nil end
-
+    
     for _,v in pairs(workspace:GetDescendants()) do
+        
         if v:IsA("BasePart") then
             
-            if string.find(v.Name:lower(),"mushroom") then
+            local c = v.Color
+            
+            local red = (c.R > 0.8 and c.G < 0.3 and c.B < 0.3)
+            local blue = (c.B > 0.8 and c.R < 0.3)
+            local gold = (c.R > 0.8 and c.G > 0.6 and c.B < 0.2)
+            
+            if red or blue or gold then
                 
                 local d = (root.Position - v.Position).Magnitude
                 
@@ -599,10 +607,13 @@ local function getClosestRedMushroom()
                 end
                 
             end
+            
         end
+        
     end
-
+    
     return closest
+    
 end
 
 MainTab:Button({
@@ -629,8 +640,8 @@ MainTab:Button({
     end
 })
 MainTab:Button({
-    Title = "Teleport Red Mushroom",
-    Desc = "กด 1 ครั้ง วาปไปเห็ดเงิน",
+    Title = "Teleport Money Mushroom",
+    Desc = "กด 1 ครั้ง วาปไปเห็ดเงินที่ใกล้ที่สุด",
     Callback = function()
 
         local char = game.Players.LocalPlayer.Character
@@ -639,12 +650,12 @@ MainTab:Button({
         local root = char:FindFirstChild("HumanoidRootPart")
         if not root then return end
         
-        local mushroom = getClosestRedMushroom()
-
-        if mushroom then
-            root.CFrame = mushroom.CFrame + Vector3.new(0,20,0)
+        local mush = getClosestMoneyMushroom()
+        
+        if mush then
+            root.CFrame = mush.CFrame + Vector3.new(0,25,0)
         end
-
+        
     end
 })
 
