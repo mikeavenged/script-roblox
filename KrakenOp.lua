@@ -562,14 +562,14 @@ local function updateShooms()
         or v.Name == "Gold Shoom Pile" then
             
             if v:IsA("Model") then
-                local part = v:FindFirstChildWhichIsA("BasePart")
+                local part = v:FindFirstChildWhichIsA("BasePart", true) -- ค้นหาลึกทุกชั้น
                 if part then
                     table.insert(shoomList, part)
                 end
             elseif v:IsA("BasePart") then
                 table.insert(shoomList, v)
             end
-            
+
         end
     end
 end
@@ -578,16 +578,14 @@ MainTab:Button({
     Desc = "กดเพื่อวาปไป Shoom ถัดไป",
     Callback = function()
 
+        updateShooms() -- สแกนใหม่ก่อน
+
         local player = game.Players.LocalPlayer
         local char = player.Character
         if not char then return end
 
         local hrp = char:FindFirstChild("HumanoidRootPart")
         if not hrp then return end
-
-        if #shoomList == 0 then
-            updateShooms()
-        end
 
         if shoomIndex > #shoomList then
             shoomIndex = 1
@@ -597,7 +595,7 @@ MainTab:Button({
 
         if shoom then
             hrp.CFrame = shoom.CFrame + Vector3.new(0,6,0)
-            shoomIndex = shoomIndex + 1
+            shoomIndex += 1
         end
 
     end
