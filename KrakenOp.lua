@@ -74,6 +74,32 @@ _G.Hitbox = false
 _G.KillAura = false
 _G.PlayerESP = false
 _G.FastHunger = false
+_G.Invisible = false
+task.spawn(function()
+    while task.wait(0.5) do
+        if not _G.Invisible then continue end
+        
+        local char = game.Players.LocalPlayer.Character
+        if not char then continue end
+        
+        for _,v in pairs(char:GetDescendants()) do
+            
+            if v:IsA("BasePart") then
+                v.Transparency = 1
+                v.CanCollide = false
+            end
+            
+            if v:IsA("Decal") then
+                v.Transparency = 1
+            end
+            
+            if v:IsA("BillboardGui") then
+                v.Enabled = false
+            end
+            
+        end
+    end
+end)
 task.spawn(function()
     while task.wait(0.05) do
         if not _G.FastHunger then continue end
@@ -550,6 +576,17 @@ local function getTokens()
     
     return tokens
 end
+local function getMushrooms()
+    local mushrooms = {}
+
+    for _,v in pairs(workspace:GetDescendants()) do
+        if string.find(v.Name:lower(),"mushroom") and v:IsA("BasePart") then
+            table.insert(mushrooms,v)
+        end
+    end
+
+    return mushrooms
+end
 
 MainTab:Button({
     Title = "Teleport All Tokens",
@@ -572,6 +609,29 @@ MainTab:Button({
         end
         
         print("Collected all tokens")
+    end
+})
+MainTab:Button({
+    Title = "Teleport All Mushrooms",
+    Desc = "วาปไปเก็บเห็ดทั้งแมพ",
+    Callback = function()
+
+        local char = game.Players.LocalPlayer.Character
+        if not char then return end
+
+        local root = char:FindFirstChild("HumanoidRootPart")
+        if not root then return end
+
+        local mushrooms = getMushrooms()
+
+        for _,m in pairs(mushrooms) do
+            if m and m.Parent then
+                root.CFrame = m.CFrame + Vector3.new(0,5,0)
+                task.wait(0.6)
+            end
+        end
+
+        print("Collected all mushrooms")
     end
 })
 local AutoFarmToggle = MainTab:Toggle({
@@ -646,7 +706,36 @@ MainTab:Toggle({
         _G.FastHunger = Value
     end
 })
-
+MainTab:Toggle({
+    Title = "Invisible",
+    Desc = "ล่องหน",
+    Default = false,
+    Callback = function(Value)
+        _G.Invisible = Value
+        
+        if not Value then
+            local char = game.Players.LocalPlayer.Character
+            if not char then return end
+            
+            for _,v in pairs(char:GetDescendants()) do
+                
+                if v:IsA("BasePart") then
+                    v.Transparency = 0
+                    v.CanCollide = true
+                end
+                
+                if v:IsA("Decal") then
+                    v.Transparency = 0
+                end
+                
+                if v:IsA("BillboardGui") then
+                    v.Enabled = true
+                end
+                
+            end
+        end
+    end
+})
 task.spawn(function()
     while true do
         task.wait(0.3)
