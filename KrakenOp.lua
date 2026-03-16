@@ -78,35 +78,36 @@ _G.Invisible = false
 _G.FastHunger = false
 
 task.spawn(function()
-    while task.wait(1) do
-        if _G.FastHunger then
-            local char = game.Players.LocalPlayer.Character
-            if char then
-
-                local stats = char:FindFirstChild("PlayerStats")
-                or char:FindFirstChild("Status")
-                or char:FindFirstChild("Values")
-
-                if stats then
-                    local hunger = stats:FindFirstChild("Hunger")
-
-                    if hunger then
-                        hunger.Value = 0
-                    end
+    while task.wait(0.5) do
+        if not _G.FastHunger then continue end
+        
+        local char = game.Players.LocalPlayer.Character
+        if not char then continue end
+        
+        for _,v in pairs(char:GetDescendants()) do
+            if v:IsA("NumberValue") then
+                if string.find(v.Name:lower(),"hunger") 
+                or string.find(v.Name:lower(),"food") then
+                    
+                    v.Value = 0
+                    
                 end
-
             end
         end
     end
 end)
 task.spawn(function()
     while task.wait(0.1) do
-        if _G.GodMode then
-            local char = game.Players.LocalPlayer.Character
-            if char then
-                local hum = char:FindFirstChildOfClass("Humanoid")
-                if hum then
-                    hum.Health = hum.MaxHealth
+        if not _G.GodMode then continue end
+        
+        local char = game.Players.LocalPlayer.Character
+        if not char then continue end
+        
+        for _,v in pairs(char:GetDescendants()) do
+            if v:IsA("NumberValue") then
+                if string.find(v.Name:lower(),"health") 
+or string.find(v.Name:lower(),"hp") then
+                    v.Value = 999999999
                 end
             end
         end
@@ -116,6 +117,7 @@ task.spawn(function()
     while task.wait(1) do
         local char = game.Players.LocalPlayer.Character
         if char then
+
             for _,v in pairs(char:GetDescendants()) do
                 if v:IsA("BasePart") and v.Name ~= "HumanoidRootPart" then
                     if _G.Invisible then
@@ -125,6 +127,18 @@ task.spawn(function()
                     end
                 end
             end
+
+            local root = char:FindFirstChild("HumanoidRootPart")
+            if root then
+                if _G.Invisible then
+                    root.Transparency = 1
+                    root.Size = Vector3.new(1,1,1)
+                else
+                    root.Transparency = 0
+                    root.Size = Vector3.new(2,2,2)
+                end
+            end
+
         end
     end
 end)
