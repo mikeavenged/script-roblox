@@ -550,39 +550,58 @@ local function getTokens()
     
     return tokens
 end
-local function getClosestShoom()
+local shoomIndex = 1
+local shoomList = {}
 
-    local closest = nil
-    local dist = math.huge
-    
-    local char = game.Players.LocalPlayer.Character
-    if not char then return nil end
-    
-    local root = char:FindFirstChild("HumanoidRootPart")
-    if not root then return nil end
+local function updateShooms()
+    shoomList = {}
 
     for _,v in pairs(workspace:GetDescendants()) do
-        
-        if v:IsA("BasePart") then
+        if v.Name == "Red Shoom Pile"
+        or v.Name == "Silver Shoom Pile"
+        or v.Name == "Gold Shoom Pile" then
             
-            if v.Name:lower():find("shoom pile") then
-                
-                local d = (root.Position - v.Position).Magnitude
-                
-                if d < dist then
-                    dist = d
-                    closest = v
+            if v:IsA("Model") then
+                local part = v:FindFirstChildWhichIsA("BasePart")
+                if part then
+                    table.insert(shoomList, part)
                 end
-                
+            elseif v:IsA("BasePart") then
+                table.insert(shoomList, v)
             end
             
         end
-        
     end
-    
-    return closest
-    
 end
+MainTab:Button({
+    Title = "Next Shoom",
+    Desc = "กดเพื่อวาปไป Shoom ถัดไป",
+    Callback = function()
+
+        local player = game.Players.LocalPlayer
+        local char = player.Character
+        if not char then return end
+
+        local hrp = char:FindFirstChild("HumanoidRootPart")
+        if not hrp then return end
+
+        if #shoomList == 0 then
+            updateShooms()
+        end
+
+        if shoomIndex > #shoomList then
+            shoomIndex = 1
+        end
+
+        local shoom = shoomList[shoomIndex]
+
+        if shoom then
+            hrp.CFrame = shoom.CFrame + Vector3.new(0,6,0)
+            shoomIndex = shoomIndex + 1
+        end
+
+    end
+})
 
 MainTab:Button({
     Title = "Teleport All Tokens",
@@ -605,27 +624,6 @@ MainTab:Button({
         end
         
         print("Collected all tokens")
-    end
-})
-MainTab:Button({
-    Title = "Teleport Shoom Pile",
-    Desc = "กดเพื่อวาปไป Shoom Pile",
-    Callback = function()
-
-        local char = game.Players.LocalPlayer.Character
-        if not char then return end
-        
-        local root = char:FindFirstChild("HumanoidRootPart")
-        if not root then return end
-        
-        local shoom = getClosestShoom()
-        
-        if shoom then
-            root.CFrame = shoom.CFrame * CFrame.new(0,30,0)
-        else
-            warn("Shoom Pile not found")
-        end
-        
     end
 })
 
