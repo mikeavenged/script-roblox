@@ -588,14 +588,16 @@ local function getClosestRedMushroom()
 
     for _,v in pairs(workspace:GetDescendants()) do
         if v:IsA("BasePart") then
-            local color = v.Color
-
-            if color.R > 0.8 and color.G < 0.2 and color.B < 0.2 then
+            
+            if string.find(v.Name:lower(),"mushroom") then
+                
                 local d = (root.Position - v.Position).Magnitude
+                
                 if d < dist then
                     dist = d
                     closest = v
                 end
+                
             end
         end
     end
@@ -628,7 +630,7 @@ MainTab:Button({
 })
 MainTab:Button({
     Title = "Teleport Red Mushroom",
-    Desc = "กด 1 ครั้ง วาปไปเห็ดแดง 1 อัน",
+    Desc = "กด 1 ครั้ง วาปไปเห็ดเงิน",
     Callback = function()
 
         local char = game.Players.LocalPlayer.Character
@@ -640,7 +642,7 @@ MainTab:Button({
         local mushroom = getClosestRedMushroom()
 
         if mushroom then
-            root.CFrame = mushroom.CFrame + Vector3.new(0,5,0)
+            root.CFrame = mushroom.CFrame + Vector3.new(0,20,0)
         end
 
     end
