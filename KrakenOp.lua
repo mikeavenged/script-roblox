@@ -550,7 +550,7 @@ local function getTokens()
     
     return tokens
 end
-local function getClosestMoneyMushroom()
+local function getClosestShoom()
 
     local closest = nil
     local dist = math.huge
@@ -567,7 +567,7 @@ local function getClosestMoneyMushroom()
             
             local name = v.Name:lower()
             
-            if name:find("mushroom") or name:find("shroom") then
+            if name:find("shoom") then
                 
                 local d = (root.Position - v.Position).Magnitude
                 
@@ -610,8 +610,8 @@ MainTab:Button({
     end
 })
 MainTab:Button({
-    Title = "Teleport Money Mushroom",
-    Desc = "กด 1 ครั้ง วาปไปเห็ดเงินที่ใกล้ที่สุด",
+    Title = "Teleport Shooms",
+    Desc = "กด 1 ครั้ง วาปไปหา Shooms ใกล้ที่สุด",
     Callback = function()
 
         local char = game.Players.LocalPlayer.Character
@@ -620,12 +620,12 @@ MainTab:Button({
         local root = char:FindFirstChild("HumanoidRootPart")
         if not root then return end
         
-        local mush = getClosestMoneyMushroom()
+        local shoom = getClosestShoom()
         
-        if mush then
-            root.CFrame = mush.CFrame * CFrame.new(0,35,0)
+        if shoom then
+            root.CFrame = shoom.CFrame * CFrame.new(0,35,0)
         else
-            warn("No mushroom found")
+            warn("Shooms not found")
         end
         
     end
