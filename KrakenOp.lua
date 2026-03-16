@@ -565,13 +565,9 @@ local function getClosestMoneyMushroom()
         
         if v:IsA("BasePart") then
             
-            local c = v.Color
+            local name = v.Name:lower()
             
-            local red = (c.R > 0.8 and c.G < 0.3 and c.B < 0.3)
-            local blue = (c.B > 0.8 and c.R < 0.3)
-            local gold = (c.R > 0.8 and c.G > 0.6 and c.B < 0.2)
-            
-            if red or blue or gold then
+            if name:find("mushroom") or name:find("shroom") then
                 
                 local d = (root.Position - v.Position).Magnitude
                 
@@ -627,7 +623,9 @@ MainTab:Button({
         local mush = getClosestMoneyMushroom()
         
         if mush then
-            root.CFrame = mush.CFrame + Vector3.new(0,40,0)
+            root.CFrame = mush.CFrame * CFrame.new(0,35,0)
+        else
+            warn("No mushroom found")
         end
         
     end
@@ -703,31 +701,6 @@ MainTab:Toggle({
     Default = false,
     Callback = function(Value)
         _G.FastHunger = Value
-    end
-})
-local invisible = false
-
-MainTab:Toggle({
-    Title = "Invisible",
-    Default = false,
-    Callback = function(v)
-
-        invisible = v
-        local char = game.Players.LocalPlayer.Character
-
-        for _,obj in pairs(char:GetDescendants()) do
-            
-            if obj:IsA("BasePart") then
-                if obj.Name ~= "HumanoidRootPart" then
-                    obj.Transparency = invisible and 1 or 0
-                end
-            end
-
-            if obj:IsA("Decal") then
-                obj.Transparency = invisible and 1 or 0
-            end
-
-        end
     end
 })
 task.spawn(function()
