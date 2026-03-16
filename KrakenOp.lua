@@ -71,6 +71,63 @@ local Camera = Workspace.CurrentCamera
 local AttackRemote = game.ReplicatedStorage:FindFirstChild("Attack")
 _G.RemoteAttack = false
 _G.KillAura = false
+_G.PlayerESP = false
+
+local function createESP(player)
+    if player == LocalPlayer then return end
+    
+    local char = player.Character
+    if not char then return end
+    
+    local root = char:FindFirstChild("HumanoidRootPart")
+    if not root then return end
+    
+    if root:FindFirstChild("PlayerESP") then return end
+    
+    local billboard = Instance.new("BillboardGui")
+    billboard.Name = "PlayerESP"
+    billboard.Size = UDim2.new(0,200,0,50)
+    billboard.AlwaysOnTop = true
+    billboard.StudsOffset = Vector3.new(0,3,0)
+    billboard.Parent = root
+    
+    local text = Instance.new("TextLabel")
+    text.Size = UDim2.new(1,0,1,0)
+    text.BackgroundTransparency = 1
+    text.TextColor3 = Color3.new(1,0,0)
+    text.TextStrokeTransparency = 0
+    text.Font = Enum.Font.SourceSansBold
+    text.TextScaled = true
+    text.Parent = billboard
+    
+    task.spawn(function()
+        while billboard.Parent and _G.PlayerESP do
+            task.wait(0.3)
+            
+            local myChar = LocalPlayer.Character
+            if not myChar then continue end
+            
+            local myRoot = myChar:FindFirstChild("HumanoidRootPart")
+            if myRoot then
+                local dist = (root.Position - myRoot.Position).Magnitude
+                text.Text = player.Name.." | "..math.floor(dist).."m"
+            end
+        end
+        
+        billboard:Destroy()
+    end)
+end
+
+task.spawn(function()
+    while task.wait(1) do
+        if _G.PlayerESP then
+            for _,v in pairs(Players:GetPlayers()) do
+                createESP(v)
+            end
+        end
+    end
+end)
+
 
 task.spawn(function()
     while task.wait(0.1) do
@@ -477,11 +534,11 @@ MainTab:Toggle({
     end
 })
 MainTab:Toggle({
-    Title = "Remote Attack (ไกลสุด)",
-    Desc = "ตีจากไกลโดยไม่ต้องวาป",
+    Title = "Player ESP",
+    Desc = "เห็นผู้เล่นทุกคนในแมพ",
     Default = false,
     Callback = function(Value)
-        _G.RemoteAttack = Value
+        _G.PlayerESP = Value
     end
 })
 MainTab:Toggle({
