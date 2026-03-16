@@ -557,28 +557,28 @@ local function updateShooms()
     shoomList = {}
 
     for _,v in pairs(workspace:GetDescendants()) do
+        
         if v.Name == "Red Shoom Pile"
         or v.Name == "Silver Shoom Pile"
         or v.Name == "Gold Shoom Pile" then
             
             if v:IsA("Model") then
-                local part = v:FindFirstChildWhichIsA("BasePart", true) -- ค้นหาลึกทุกชั้น
-                if part then
-                    table.insert(shoomList, part)
-                end
+                table.insert(shoomList, v)
             elseif v:IsA("BasePart") then
                 table.insert(shoomList, v)
             end
-
+            
         end
+        
     end
+    
 end
 MainTab:Button({
-    Title = "Next Shoom",
+    Title = "Next Shoom2",
     Desc = "กดเพื่อวาปไป Shoom ถัดไป",
     Callback = function()
 
-        updateShooms() -- สแกนใหม่ก่อน
+        updateShooms()
 
         local player = game.Players.LocalPlayer
         local char = player.Character
@@ -587,6 +587,11 @@ MainTab:Button({
         local hrp = char:FindFirstChild("HumanoidRootPart")
         if not hrp then return end
 
+        if #shoomList == 0 then
+            warn("ไม่พบ Shoom")
+            return
+        end
+
         if shoomIndex > #shoomList then
             shoomIndex = 1
         end
@@ -594,7 +599,13 @@ MainTab:Button({
         local shoom = shoomList[shoomIndex]
 
         if shoom then
-            hrp.CFrame = shoom.CFrame + Vector3.new(0,6,0)
+            
+            if shoom:IsA("Model") then
+                hrp.CFrame = shoom:GetPivot() + Vector3.new(0,6,0)
+            else
+                hrp.CFrame = shoom.CFrame + Vector3.new(0,6,0)
+            end
+
             shoomIndex += 1
         end
 
