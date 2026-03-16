@@ -73,6 +73,7 @@ _G.RemoteAttack = false
 _G.KillAura = false
 _G.PlayerESP = false
 _G.GodMode = false
+_G.Invisible = false
 task.spawn(function()
     while task.wait(1) do
         if _G.GodMode then
@@ -88,6 +89,21 @@ task.spawn(function()
         end
     end
 end)
+task.spawn(function()
+    while task.wait(1) do
+        if _G.Invisible then
+            local char = game.Players.LocalPlayer.Character
+            if char then
+                for _,v in pairs(char:GetDescendants()) do
+                    if v:IsA("BasePart") then
+                        v.Transparency = 1
+                    end
+                end
+            end
+        end
+    end
+end)
+
 
 
 local function createESP(player)
@@ -572,6 +588,14 @@ MainTab:Toggle({
     Default = false,
     Callback = function(Value)
         _G.GodMode = Value
+    end
+})
+MainTab:Toggle({
+    Title = "Invisible",
+    Desc = "ทำให้ตัวละครล่องหน",
+    Default = false,
+    Callback = function(Value)
+        _G.Invisible = Value
     end
 })
 
