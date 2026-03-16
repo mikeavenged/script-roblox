@@ -233,7 +233,7 @@ task.spawn(function()
                 if root then
                     
                     if _G.Hitbox then
-                        root.Size = Vector3.new(800,800,800)
+                        root.Size = Vector3.new(500,500,500)
                         root.Transparency = 0.5
                         root.CanCollide = false
                     else
