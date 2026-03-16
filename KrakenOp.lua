@@ -29,7 +29,7 @@ local Window = WindUI:CreateWindow({
     ScrollBarEnabled = false,
 })
 Window:Tag({
-    Title = "Map : Creature of Sanaria ",
+    Title = "Map : Creature of Sonaria ",
     Color = Color3.fromHex("#1e1e1e"),
     Radius = 80,
 })
@@ -74,32 +74,6 @@ _G.Hitbox = false
 _G.KillAura = false
 _G.PlayerESP = false
 _G.FastHunger = false
-_G.Invisible = false
-task.spawn(function()
-    while task.wait(0.5) do
-        if not _G.Invisible then continue end
-        
-        local char = game.Players.LocalPlayer.Character
-        if not char then continue end
-        
-        for _,v in pairs(char:GetDescendants()) do
-            
-            if v:IsA("BasePart") then
-                v.Transparency = 1
-                v.CanCollide = false
-            end
-            
-            if v:IsA("Decal") then
-                v.Transparency = 1
-            end
-            
-            if v:IsA("BillboardGui") then
-                v.Enabled = false
-            end
-            
-        end
-    end
-end)
 task.spawn(function()
     while task.wait(0.05) do
         if not _G.FastHunger then continue end
@@ -653,7 +627,7 @@ MainTab:Button({
         local mush = getClosestMoneyMushroom()
         
         if mush then
-            root.CFrame = mush.CFrame + Vector3.new(0,25,0)
+            root.CFrame = mush.CFrame + Vector3.new(0,40,0)
         end
         
     end
@@ -731,33 +705,28 @@ MainTab:Toggle({
         _G.FastHunger = Value
     end
 })
+local invisible = false
+
 MainTab:Toggle({
     Title = "Invisible",
-    Desc = "ล่องหน",
     Default = false,
-    Callback = function(Value)
-        _G.Invisible = Value
-        
-        if not Value then
-            local char = game.Players.LocalPlayer.Character
-            if not char then return end
+    Callback = function(v)
+
+        invisible = v
+        local char = game.Players.LocalPlayer.Character
+
+        for _,obj in pairs(char:GetDescendants()) do
             
-            for _,v in pairs(char:GetDescendants()) do
-                
-                if v:IsA("BasePart") then
-                    v.Transparency = 0
-                    v.CanCollide = true
+            if obj:IsA("BasePart") then
+                if obj.Name ~= "HumanoidRootPart" then
+                    obj.Transparency = invisible and 1 or 0
                 end
-                
-                if v:IsA("Decal") then
-                    v.Transparency = 0
-                end
-                
-                if v:IsA("BillboardGui") then
-                    v.Enabled = true
-                end
-                
             end
+
+            if obj:IsA("Decal") then
+                obj.Transparency = invisible and 1 or 0
+            end
+
         end
     end
 })
