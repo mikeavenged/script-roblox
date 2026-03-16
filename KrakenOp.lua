@@ -560,14 +560,12 @@ local function getClosestShoom()
     
     local root = char:FindFirstChild("HumanoidRootPart")
     if not root then return nil end
-    
+
     for _,v in pairs(workspace:GetDescendants()) do
         
         if v:IsA("BasePart") then
             
-            local name = v.Name:lower()
-            
-            if name:find("shoom") then
+            if v.Name:lower():find("shoom pile") then
                 
                 local d = (root.Position - v.Position).Magnitude
                 
@@ -610,8 +608,8 @@ MainTab:Button({
     end
 })
 MainTab:Button({
-    Title = "Teleport Shooms",
-    Desc = "กด 1 ครั้ง วาปไปหา Shooms ใกล้ที่สุด",
+    Title = "Teleport Shoom Pile",
+    Desc = "กดเพื่อวาปไป Shoom Pile",
     Callback = function()
 
         local char = game.Players.LocalPlayer.Character
@@ -623,9 +621,9 @@ MainTab:Button({
         local shoom = getClosestShoom()
         
         if shoom then
-            root.CFrame = shoom.CFrame * CFrame.new(0,35,0)
+            root.CFrame = shoom.CFrame * CFrame.new(0,30,0)
         else
-            warn("Shooms not found")
+            warn("Shoom Pile not found")
         end
         
     end
