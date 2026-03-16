@@ -73,8 +73,6 @@ _G.RemoteAttack = false
 _G.Hitbox = false
 _G.KillAura = false
 _G.PlayerESP = false
-_G.GodMode = false
-_G.Invisible = false
 _G.FastHunger = false
 
 task.spawn(function()
@@ -96,55 +94,6 @@ task.spawn(function()
         end
     end
 end)
-task.spawn(function()
-    while task.wait(0.1) do
-        if not _G.GodMode then continue end
-        
-        local char = game.Players.LocalPlayer.Character
-        if not char then continue end
-        
-        for _,v in pairs(char:GetDescendants()) do
-            if v:IsA("NumberValue") then
-                if string.find(v.Name:lower(),"health") 
-or string.find(v.Name:lower(),"hp") then
-                    v.Value = 999999999
-                end
-            end
-        end
-    end
-end)
-task.spawn(function()
-    while task.wait(1) do
-        local char = game.Players.LocalPlayer.Character
-        if char then
-
-            for _,v in pairs(char:GetDescendants()) do
-                if v:IsA("BasePart") and v.Name ~= "HumanoidRootPart" then
-                    if _G.Invisible then
-                        v.Transparency = 1
-                    else
-                        v.Transparency = 0
-                    end
-                end
-            end
-
-            local root = char:FindFirstChild("HumanoidRootPart")
-            if root then
-                if _G.Invisible then
-                    root.Transparency = 1
-                    root.Size = Vector3.new(1,1,1)
-                else
-                    root.Transparency = 0
-                    root.Size = Vector3.new(2,2,2)
-                end
-            end
-
-        end
-    end
-end)
-
-
-
 local function createESP(player)
     if player == LocalPlayer then return end
     
@@ -639,22 +588,6 @@ MainTab:Toggle({
     Default = false,
     Callback = function(Value)
         _G.KillAura = Value
-    end
-})
-MainTab:Toggle({
-    Title = "God Mode",
-    Desc = "อมตะ ไม่โดนดาเมจ",
-    Default = false,
-    Callback = function(Value)
-        _G.GodMode = Value
-    end
-})
-MainTab:Toggle({
-    Title = "Invisible",
-    Desc = "ทำให้ตัวละครล่องหน",
-    Default = false,
-    Callback = function(Value)
-        _G.Invisible = Value
     end
 })
 MainTab:Toggle({
