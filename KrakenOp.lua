@@ -78,17 +78,23 @@ _G.Invisible = false
 _G.FastHunger = false
 
 task.spawn(function()
-    while task.wait(2) do
+    while task.wait(1) do
         if _G.FastHunger then
             local char = game.Players.LocalPlayer.Character
             if char then
-                local stats = char:FindFirstChild("PlayerStats") or char:FindFirstChild("Status") or char:FindFirstChild("Values")
+
+                local stats = char:FindFirstChild("PlayerStats")
+                or char:FindFirstChild("Status")
+                or char:FindFirstChild("Values")
+
                 if stats then
                     local hunger = stats:FindFirstChild("Hunger")
+
                     if hunger then
-                        hunger.Value = hunger.Value - 200
+                        hunger.Value = 0
                     end
                 end
+
             end
         end
     end
