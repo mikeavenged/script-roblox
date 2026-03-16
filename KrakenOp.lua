@@ -69,11 +69,55 @@ local LocalPlayer = Players.LocalPlayer
 local Workspace = game:GetService("Workspace")
 local Camera = Workspace.CurrentCamera
 local AttackRemote = game.ReplicatedStorage:FindFirstChild("Attack")
+
 _G.RemoteAttack = false
 _G.Hitbox = false
 _G.KillAura = false
 _G.PlayerESP = false
 _G.FastHunger = false
+_G.AutoShoom = false
+task.spawn(function()
+    while task.wait(0.4) do
+        
+        if not _G.AutoShoom then
+            continue
+        end
+        
+        local player = game.Players.LocalPlayer
+        local char = player.Character
+        if not char then continue end
+        
+        local root = char:FindFirstChild("HumanoidRootPart")
+        if not root then continue end
+        
+        for _,v in pairs(workspace:GetDescendants()) do
+            
+            if v.Name == "Red Shoom Pile"
+            or v.Name == "Silver Shoom Pile"
+            or v.Name == "Gold Shoom Pile" then
+                
+                if v:IsA("Model") then
+                    
+                    local part = v:FindFirstChildWhichIsA("BasePart")
+                    
+                    if part then
+                        root.CFrame = part.CFrame + Vector3.new(0,3,0)
+                        task.wait(0.6)
+                    end
+                    
+                elseif v:IsA("BasePart") then
+                    
+                    root.CFrame = v.CFrame + Vector3.new(0,3,0)
+                    task.wait(0.6)
+                    
+                end
+                
+            end
+            
+        end
+        
+    end
+end)
 task.spawn(function()
     while task.wait(0.05) do
         if not _G.FastHunger then continue end
@@ -573,20 +617,12 @@ local function updateShooms()
     end
     
 end
-MainTab:Button({
-    Title = "Collect Shoom",
-    Desc = "Collect Shoom Remote",
-    Callback = function()
-
-        local remote = game.ReplicatedStorage.Remotes:FindFirstChild("ShoomPileCollected")
-
-        if remote then
-            for i = 1,50 do
-                remote:FireServer()
-                task.wait(0.1)
-            end
-        end
-
+MainTab:Toggle({
+    Title = "Auto Shoom Farm",
+    Desc = "วาปเก็บ Shoom อัตโนมัติ",
+    Default = false,
+    Callback = function(Value)
+        _G.AutoShoom = Value
     end
 })
 
