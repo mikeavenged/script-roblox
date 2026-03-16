@@ -535,6 +535,45 @@ char.HumanoidRootPart.CFrame = CFrame.new(-1626.9925537109375,240.81964111328125
 end
 end
 })
+MainTab:Section({
+    Title = "// Token"
+})
+
+local function getTokens()
+    local tokens = {}
+    
+    for _,v in pairs(workspace:GetDescendants()) do
+        if string.find(v.Name:lower(),"token") and v:IsA("BasePart") then
+            table.insert(tokens,v)
+        end
+    end
+    
+    return tokens
+end
+
+MainTab:Button({
+    Title = "Teleport All Tokens",
+    Desc = "วาปไปเก็บ Token ทุกอันในแมพ",
+    Callback = function()
+        
+        local char = game.Players.LocalPlayer.Character
+        if not char then return end
+        
+        local root = char:FindFirstChild("HumanoidRootPart")
+        if not root then return end
+        
+        local tokens = getTokens()
+        
+        for _,token in pairs(tokens) do
+            if token and token.Parent then
+                root.CFrame = token.CFrame + Vector3.new(0,5,0)
+                task.wait(0.6)
+            end
+        end
+        
+        print("Collected all tokens")
+    end
+})
 local AutoFarmToggle = MainTab:Toggle({
     Title = "Auto Farm ",
     Desc = "ฟาร์มโหดๆ555 ",
