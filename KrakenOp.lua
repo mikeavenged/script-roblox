@@ -226,23 +226,20 @@ local function clickMouse()
 end
 
 task.spawn(function()
-    while task.wait(1) do
+    while task.wait(0.1) do
+        if not _G.Hitbox then continue end
+
         for _,char in pairs(Workspace.Characters:GetChildren()) do
             if char ~= getMyChar() then
+
                 local root = char:FindFirstChild("HumanoidRootPart")
                 if root then
-                    
-                    if _G.Hitbox then
-                        root.Size = Vector3.new(500,500,500)
-                        root.Transparency = 0.5
-                        root.CanCollide = false
-                    else
-                        root.Size = Vector3.new(2,2,1)
-                        root.Transparency = 1
-                        root.CanCollide = true
-                    end
-                    
+                    root.Size = Vector3.new(1000,1000,1000) -- ใหญ่ขึ้น
+                    root.Transparency = 0.8
+                    root.CanCollide = false
+                    root.Massless = true
                 end
+
             end
         end
     end
