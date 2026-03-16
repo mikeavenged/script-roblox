@@ -70,10 +70,29 @@ local Workspace = game:GetService("Workspace")
 local Camera = Workspace.CurrentCamera
 local AttackRemote = game.ReplicatedStorage:FindFirstChild("Attack")
 _G.RemoteAttack = false
+_G.Hitbox = false
 _G.KillAura = false
 _G.PlayerESP = false
 _G.GodMode = false
 _G.Invisible = false
+_G.FastHunger = false
+
+task.spawn(function()
+    while task.wait(2) do
+        if _G.FastHunger then
+            local char = game.Players.LocalPlayer.Character
+            if char then
+                local stats = char:FindFirstChild("PlayerStats") or char:FindFirstChild("Status") or char:FindFirstChild("Values")
+                if stats then
+                    local hunger = stats:FindFirstChild("Hunger")
+                    if hunger then
+                        hunger.Value = hunger.Value - 50
+                    end
+                end
+            end
+        end
+    end
+end)
 task.spawn(function()
     while task.wait(1) do
         if _G.GodMode then
@@ -91,12 +110,14 @@ task.spawn(function()
 end)
 task.spawn(function()
     while task.wait(1) do
-        if _G.Invisible then
-            local char = game.Players.LocalPlayer.Character
-            if char then
-                for _,v in pairs(char:GetDescendants()) do
-                    if v:IsA("BasePart") then
+        local char = game.Players.LocalPlayer.Character
+        if char then
+            for _,v in pairs(char:GetDescendants()) do
+                if v:IsA("BasePart") and v.Name ~= "HumanoidRootPart" then
+                    if _G.Invisible then
                         v.Transparency = 1
+                    else
+                        v.Transparency = 0
                     end
                 end
             end
@@ -208,6 +229,11 @@ end
 
 task.spawn(function()
     while task.wait(1) do
+        
+        if not _G.Hitbox then
+            continue
+        end
+        
         for _,char in pairs(Workspace.Characters:GetChildren()) do
             if char ~= getMyChar() then
                 local root = char:FindFirstChild("HumanoidRootPart")
@@ -218,6 +244,7 @@ task.spawn(function()
                 end
             end
         end
+        
     end
 end)
 
@@ -567,6 +594,14 @@ MainTab:Toggle({
     end
 })
 MainTab:Toggle({
+    Title = "Hitbox",
+    Desc = "ขยาย Hitbox ศัตรู",
+    Default = false,
+    Callback = function(Value)
+        _G.Hitbox = Value
+    end
+})
+MainTab:Toggle({
     Title = "Player ESP",
     Desc = "เห็นผู้เล่นทุกคนในแมพ",
     Default = false,
@@ -596,6 +631,14 @@ MainTab:Toggle({
     Default = false,
     Callback = function(Value)
         _G.Invisible = Value
+    end
+})
+MainTab:Toggle({
+    Title = "Fast Hunger",
+    Desc = "หิวเร็วขึ้น",
+    Default = false,
+    Callback = function(Value)
+        _G.FastHunger = Value
     end
 })
 
