@@ -576,12 +576,16 @@ local function getTokens()
     
     return tokens
 end
-local function getMushrooms()
+local function getRedMushrooms()
     local mushrooms = {}
 
     for _,v in pairs(workspace:GetDescendants()) do
-        if string.find(v.Name:lower(),"mushroom") and v:IsA("BasePart") then
-            table.insert(mushrooms,v)
+        if v:IsA("BasePart") then
+            local color = v.Color
+            
+            if color.R > 0.8 and color.G < 0.2 and color.B < 0.2 then
+                table.insert(mushrooms,v)
+            end
         end
     end
 
@@ -612,17 +616,17 @@ MainTab:Button({
     end
 })
 MainTab:Button({
-    Title = "Teleport All Mushrooms",
-    Desc = "วาปไปเก็บเห็ดทั้งแมพ",
+    Title = "Teleport Red Mushrooms",
+    Desc = "วาปไปเก็บเห็ดแดงเงิน",
     Callback = function()
 
         local char = game.Players.LocalPlayer.Character
         if not char then return end
-
+        
         local root = char:FindFirstChild("HumanoidRootPart")
         if not root then return end
-
-        local mushrooms = getMushrooms()
+        
+        local mushrooms = getRedMushrooms()
 
         for _,m in pairs(mushrooms) do
             if m and m.Parent then
@@ -631,9 +635,9 @@ MainTab:Button({
             end
         end
 
-        print("Collected all mushrooms")
     end
 })
+
 local AutoFarmToggle = MainTab:Toggle({
     Title = "Auto Farm ",
     Desc = "ฟาร์มโหดๆ555 ",
