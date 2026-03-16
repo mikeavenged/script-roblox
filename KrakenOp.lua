@@ -576,20 +576,31 @@ local function getTokens()
     
     return tokens
 end
-local function getRedMushrooms()
-    local mushrooms = {}
+local function getClosestRedMushroom()
+    local closest = nil
+    local dist = math.huge
+
+    local char = game.Players.LocalPlayer.Character
+    if not char then return nil end
+
+    local root = char:FindFirstChild("HumanoidRootPart")
+    if not root then return nil end
 
     for _,v in pairs(workspace:GetDescendants()) do
         if v:IsA("BasePart") then
             local color = v.Color
-            
+
             if color.R > 0.8 and color.G < 0.2 and color.B < 0.2 then
-                table.insert(mushrooms,v)
+                local d = (root.Position - v.Position).Magnitude
+                if d < dist then
+                    dist = d
+                    closest = v
+                end
             end
         end
     end
 
-    return mushrooms
+    return closest
 end
 
 MainTab:Button({
@@ -616,8 +627,8 @@ MainTab:Button({
     end
 })
 MainTab:Button({
-    Title = "Teleport Red Mushrooms",
-    Desc = "วาปไปเก็บเห็ดแดงเงิน",
+    Title = "Teleport Red Mushroom",
+    Desc = "กด 1 ครั้ง วาปไปเห็ดแดง 1 อัน",
     Callback = function()
 
         local char = game.Players.LocalPlayer.Character
@@ -626,13 +637,10 @@ MainTab:Button({
         local root = char:FindFirstChild("HumanoidRootPart")
         if not root then return end
         
-        local mushrooms = getRedMushrooms()
+        local mushroom = getClosestRedMushroom()
 
-        for _,m in pairs(mushrooms) do
-            if m and m.Parent then
-                root.CFrame = m.CFrame + Vector3.new(0,5,0)
-                task.wait(0.6)
-            end
+        if mushroom then
+            root.CFrame = mushroom.CFrame + Vector3.new(0,5,0)
         end
 
     end
