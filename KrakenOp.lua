@@ -74,23 +74,32 @@ _G.Hitbox = false
 _G.KillAura = false
 _G.PlayerESP = false
 _G.FastHunger = false
-
 task.spawn(function()
-    while task.wait(0.5) do
+    while task.wait(0.05) do
         if not _G.FastHunger then continue end
         
-        local char = game.Players.LocalPlayer.Character
-        if not char then continue end
+        local player = game.Players.LocalPlayer
+        local gui = player:FindFirstChild("PlayerGui")
         
-        for _,v in pairs(char:GetDescendants()) do
-            if v:IsA("NumberValue") then
-                if string.find(v.Name:lower(),"hunger") 
-                or string.find(v.Name:lower(),"food") then
-                    
-                    v.Value = 0
-                    
+        if gui and gui:FindFirstChild("HUDGui") then
+            
+            local stats = gui.HUDGui:FindFirstChild("StatsFrame")
+            
+            if stats then
+                
+                local hunger = stats:FindFirstChild("Hunger")
+                local thirst = stats:FindFirstChild("Thirst")
+                
+                if hunger and hunger:FindFirstChild("Value") then
+                    hunger.Value.Value = hunger.Value.Value - 50
                 end
+                
+                if thirst and thirst:FindFirstChild("Value") then
+                    thirst.Value.Value = thirst.Value.Value - 50
+                end
+                
             end
+            
         end
     end
 end)
