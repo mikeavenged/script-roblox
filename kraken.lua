@@ -122,7 +122,7 @@ task.spawn(function()
             if char ~= getMyChar() then
                 local root = char:FindFirstChild("HumanoidRootPart")
                 if root then
-                    root.Size = Vector3.new(500,500,500)
+                    root.Size = Vector3.new(1000,1000,1000)
                     root.Transparency = 0.5
                     root.CanCollide = false
                 end
