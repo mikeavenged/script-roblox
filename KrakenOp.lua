@@ -76,48 +76,7 @@ _G.KillAura = false
 _G.PlayerESP = false
 _G.FastHunger = false
 _G.AutoShoom = false
-task.spawn(function()
-    while task.wait(0.4) do
-        
-        if not _G.AutoShoom then
-            continue
-        end
-        
-        local player = game.Players.LocalPlayer
-        local char = player.Character
-        if not char then continue end
-        
-        local root = char:FindFirstChild("HumanoidRootPart")
-        if not root then continue end
-        
-        for _,v in pairs(workspace:GetDescendants()) do
-            
-            if v.Name == "Red Shoom Pile"
-            or v.Name == "Silver Shoom Pile"
-            or v.Name == "Gold Shoom Pile" then
-                
-                if v:IsA("Model") then
-                    
-                    local part = v:FindFirstChildWhichIsA("BasePart")
-                    
-                    if part then
-                        root.CFrame = part.CFrame + Vector3.new(0,3,0)
-                        task.wait(0.6)
-                    end
-                    
-                elseif v:IsA("BasePart") then
-                    
-                    root.CFrame = v.CFrame + Vector3.new(0,3,0)
-                    task.wait(0.6)
-                    
-                end
-                
-            end
-            
-        end
-        
-    end
-end)
+
 task.spawn(function()
     while task.wait(0.05) do
         if not _G.FastHunger then continue end
@@ -594,37 +553,7 @@ local function getTokens()
     
     return tokens
 end
-local ShoomRemote = game.ReplicatedStorage.Remotes:FindFirstChild("ShoomPileCollected")
 
-task.spawn(function()
-    while task.wait(0.3) do
-        
-        if not _G.AutoShoom then
-            continue
-        end
-        
-        for _,v in pairs(workspace:GetDescendants()) do
-            
-            if string.find(v.Name:lower(),"shoom") then
-                
-                if ShoomRemote then
-                    ShoomRemote:FireServer(v)
-                end
-                
-            end
-            
-        end
-        
-    end
-end)
-MainTab:Toggle({
-    Title = "Auto Shoom Farm",
-    Desc = "วาปเก็บ Shoom อัตโนมัติ",
-    Default = false,
-    Callback = function(Value)
-        _G.AutoShoom = Value
-    end
-})
 
 MainTab:Button({
     Title = "Teleport All Tokens",
