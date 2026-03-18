@@ -342,7 +342,11 @@ end
                         myRoot.CFrame = target.CFrame * CFrame.new(0, 40, 0)
                         hasTeleported = true
                     end
-                    interact()
+                    for _,v in pairs(game:GetService("ProximityPromptService"):GetDescendants()) do
+    if v:IsA("ProximityPrompt") then
+        fireproximityprompt(v)
+    end
+end
                 end
             elseif currentTask == "Drink" then
                 if tick() - foodToggleTime >= 10 then
@@ -357,7 +361,11 @@ end
                             myRoot.CFrame = target.CFrame * CFrame.new(0, 40, 0)
                             hasTeleported = true
                         end
-                        interact()
+                        for _,v in pairs(game:GetService("ProximityPromptService"):GetDescendants()) do
+    if v:IsA("ProximityPrompt") then
+        fireproximityprompt(v)
+    end
+end
                     end
                 else
                     local target = getClosestPart(Workspace.Interactions.Food, "Ribs", "Food")
@@ -371,7 +379,11 @@ myRoot.CFrame = CFrame.lookAt(telePos, lookPos)
 Camera.CFrame = CFrame.lookAt(Camera.CFrame.Position, lookPos)
                             hasTeleported = true
                         end
-                        interact()
+                        for _,v in pairs(game:GetService("ProximityPromptService"):GetDescendants()) do
+    if v:IsA("ProximityPrompt") then
+        fireproximityprompt(v)
+    end
+end
                     end
                 end
             elseif currentTask == "Sniff" then
