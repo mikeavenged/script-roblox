@@ -71,6 +71,44 @@ local Camera = Workspace.CurrentCamera
 local AttackRemote = game.ReplicatedStorage:FindFirstChild("Attack")
 _G.RemoteAttack = false
 _G.KillAura = false
+_G.MobileSaver = false
+
+local function setMobileSaver(state)
+    local lighting = game:GetService("Lighting")
+    local terrain = workspace:FindFirstChildOfClass("Terrain")
+    
+    if state then
+        lighting.GlobalShadows = false
+        lighting.Brightness = 1
+        lighting.FogEnd = 100000
+        
+        for _,v in pairs(lighting:GetDescendants()) do
+            if v:IsA("BloomEffect")
+            or v:IsA("BlurEffect")
+            or v:IsA("SunRaysEffect")
+            or v:IsA("DepthOfFieldEffect") then
+                v.Enabled = false
+            end
+        end
+        
+        for _,v in pairs(workspace:GetDescendants()) do
+            if v:IsA("BasePart") then
+                v.Material = Enum.Material.Plastic
+                v.Reflectance = 0
+            end
+        end
+        
+        if terrain then
+            terrain.WaterReflectance = 0
+            terrain.WaterWaveSize = 0
+            terrain.WaterWaveSpeed = 0
+        end
+        
+    else
+        lighting.GlobalShadows = true
+        lighting.Brightness = 2
+    end
+end
 
 task.spawn(function()
     while task.wait(0.1) do
@@ -361,7 +399,25 @@ Camera.CFrame = CFrame.lookAt(Camera.CFrame.Position, lookPos)
         end)
     end
 end)
-
+MainTab:Toggle({
+    Title = "Battery Saver 🔋",
+    Desc = "ลดร้อน + ประหยัดแบต",
+    Default = false,
+    Callback = function(Value)
+        _G.MobileSaver = Value
+        setMobileSaver(Value)
+        
+        if Value then
+            if setfpscap then
+                setfpscap(30) -- ประหยัดแบตสุด
+            end
+        else
+            if setfpscap then
+                setfpscap(60)
+            end
+        end
+    end
+})
 MainTab:Button({
 Title = "Copy Position",
 Callback = function()
