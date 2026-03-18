@@ -29,7 +29,7 @@ local Window = WindUI:CreateWindow({
     ScrollBarEnabled = false,
 })
 Window:Tag({
-    Title = "Map : Creature of Sanaria ",
+    Title = "Map : Creature of Sonaria ",
     Color = Color3.fromHex("#1e1e1e"),
     Radius = 80,
 })
@@ -69,8 +69,13 @@ local LocalPlayer = Players.LocalPlayer
 local Workspace = game:GetService("Workspace")
 local Camera = Workspace.CurrentCamera
 local AttackRemote = game.ReplicatedStorage:FindFirstChild("Attack")
+
 _G.RemoteAttack = false
+_G.Hitbox = false
 _G.KillAura = false
+_G.PlayerESP = false
+_G.FastHunger = false
+_G.AutoShoom = false
 _G.MobileSaver = false
 
 local function setMobileSaver(state)
@@ -111,6 +116,91 @@ local function setMobileSaver(state)
 end
 
 task.spawn(function()
+    while task.wait(0.05) do
+        if not _G.FastHunger then continue end
+        
+        local player = game.Players.LocalPlayer
+        local gui = player:FindFirstChild("PlayerGui")
+        
+        if gui and gui:FindFirstChild("HUDGui") then
+            
+            local stats = gui.HUDGui:FindFirstChild("StatsFrame")
+            
+            if stats then
+                
+                local hunger = stats:FindFirstChild("Hunger")
+                local thirst = stats:FindFirstChild("Thirst")
+                
+                if hunger and hunger:FindFirstChild("Value") then
+                    hunger.Value.Value = hunger.Value.Value - 50
+                end
+                
+                if thirst and thirst:FindFirstChild("Value") then
+                    thirst.Value.Value = thirst.Value.Value - 50
+                end
+                
+            end
+            
+        end
+    end
+end)
+local function createESP(player)
+    if player == LocalPlayer then return end
+    
+    local char = player.Character
+    if not char then return end
+    
+    local root = char:FindFirstChild("HumanoidRootPart")
+    if not root then return end
+    
+    if root:FindFirstChild("PlayerESP") then return end
+    
+    local billboard = Instance.new("BillboardGui")
+    billboard.Name = "PlayerESP"
+    billboard.Size = UDim2.new(0,200,0,50)
+    billboard.AlwaysOnTop = true
+    billboard.StudsOffset = Vector3.new(0,3,0)
+    billboard.Parent = root
+    
+    local text = Instance.new("TextLabel")
+    text.Size = UDim2.new(1,0,1,0)
+    text.BackgroundTransparency = 1
+    text.TextColor3 = Color3.new(1,0,0)
+    text.TextStrokeTransparency = 0
+    text.Font = Enum.Font.SourceSansBold
+    text.TextScaled = true
+    text.Parent = billboard
+    
+    task.spawn(function()
+        while billboard.Parent and _G.PlayerESP do
+            task.wait(0.3)
+            
+            local myChar = LocalPlayer.Character
+            if not myChar then continue end
+            
+            local myRoot = myChar:FindFirstChild("HumanoidRootPart")
+            if myRoot then
+                local dist = (root.Position - myRoot.Position).Magnitude
+                text.Text = player.Name.." | "..math.floor(dist).."m"
+            end
+        end
+        
+        billboard:Destroy()
+    end)
+end
+
+task.spawn(function()
+    while task.wait(1) do
+        if _G.PlayerESP then
+            for _,v in pairs(Players:GetPlayers()) do
+                createESP(v)
+            end
+        end
+    end
+end)
+
+
+task.spawn(function()
     while task.wait(0.1) do
         
         if not _G.RemoteAttack then
@@ -135,13 +225,6 @@ task.spawn(function()
         
     end
 end)
-local function interact()
-    for _,v in pairs(workspace:GetDescendants()) do
-        if v:IsA("ProximityPrompt") then
-            fireproximityprompt(v, 0) -- กดทันที
-        end
-    end
-end
 
 local function getMyChar()
     return Workspace.Characters:FindFirstChild(LocalPlayer.Name) or LocalPlayer.Character
@@ -162,14 +245,26 @@ local function clickMouse()
 end
 
 task.spawn(function()
-    while task.wait(1) do
+    while task.wait(0.2) do
         for _,char in pairs(Workspace.Characters:GetChildren()) do
             if char ~= getMyChar() then
+
                 local root = char:FindFirstChild("HumanoidRootPart")
                 if root then
-                    root.Size = Vector3.new(1000,1000,1000)
-                    root.Transparency = 0.5
-                    root.CanCollide = false
+
+                    if _G.Hitbox then
+                        -- เปิด Hitbox
+                        root.Size = Vector3.new(1000,1000,1000)
+                        root.Transparency = 0.6
+                        root.CanCollide = false
+                        root.Massless = true
+                    else
+                        -- ปิด Hitbox
+                        root.Size = Vector3.new(2,2,1)
+                        root.Transparency = 1
+                        root.CanCollide = true
+                    end
+
                 end
             end
         end
@@ -342,11 +437,7 @@ end
                         myRoot.CFrame = target.CFrame * CFrame.new(0, 40, 0)
                         hasTeleported = true
                     end
-                    for _,v in pairs(game:GetService("ProximityPromptService"):GetDescendants()) do
-    if v:IsA("ProximityPrompt") then
-        fireproximityprompt(v)
-    end
-end
+                    pressKey(Enum.KeyCode.E)
                 end
             elseif currentTask == "Drink" then
                 if tick() - foodToggleTime >= 10 then
@@ -361,11 +452,7 @@ end
                             myRoot.CFrame = target.CFrame * CFrame.new(0, 40, 0)
                             hasTeleported = true
                         end
-                        for _,v in pairs(game:GetService("ProximityPromptService"):GetDescendants()) do
-    if v:IsA("ProximityPrompt") then
-        fireproximityprompt(v)
-    end
-end
+                        pressKey(Enum.KeyCode.E)
                     end
                 else
                     local target = getClosestPart(Workspace.Interactions.Food, "Ribs", "Food")
@@ -379,11 +466,7 @@ myRoot.CFrame = CFrame.lookAt(telePos, lookPos)
 Camera.CFrame = CFrame.lookAt(Camera.CFrame.Position, lookPos)
                             hasTeleported = true
                         end
-                        for _,v in pairs(game:GetService("ProximityPromptService"):GetDescendants()) do
-    if v:IsA("ProximityPrompt") then
-        fireproximityprompt(v)
-    end
-end
+                        pressKey(Enum.KeyCode.E)
                     end
                 end
             elseif currentTask == "Sniff" then
@@ -511,6 +594,47 @@ char.HumanoidRootPart.CFrame = CFrame.new(-1626.9925537109375,240.81964111328125
 end
 end
 })
+MainTab:Section({
+    Title = "// Token"
+})
+
+local function getTokens()
+    local tokens = {}
+    
+    for _,v in pairs(workspace:GetDescendants()) do
+        if string.find(v.Name:lower(),"token") and v:IsA("BasePart") then
+            table.insert(tokens,v)
+        end
+    end
+    
+    return tokens
+end
+
+
+MainTab:Button({
+    Title = "Teleport All Tokens",
+    Desc = "วาปไปเก็บ Token ทุกอันในแมพ",
+    Callback = function()
+        
+        local char = game.Players.LocalPlayer.Character
+        if not char then return end
+        
+        local root = char:FindFirstChild("HumanoidRootPart")
+        if not root then return end
+        
+        local tokens = getTokens()
+        
+        for _,token in pairs(tokens) do
+            if token and token.Parent then
+                root.CFrame = token.CFrame + Vector3.new(0,5,0)
+                task.wait(0.6)
+            end
+        end
+        
+        print("Collected all tokens")
+    end
+})
+
 local AutoFarmToggle = MainTab:Toggle({
     Title = "Auto Farm ",
     Desc = "ฟาร์มโหดๆ555 ",
@@ -552,11 +676,19 @@ MainTab:Toggle({
     end
 })
 MainTab:Toggle({
-    Title = "Remote Attack (ไกลสุด)",
-    Desc = "ตีจากไกลโดยไม่ต้องวาป",
+    Title = "Hitbox",
+    Desc = "ขยาย Hitbox ศัตรู",
     Default = false,
     Callback = function(Value)
-        _G.RemoteAttack = Value
+        _G.Hitbox = Value
+    end
+})
+MainTab:Toggle({
+    Title = "Player ESP",
+    Desc = "เห็นผู้เล่นทุกคนในแมพ",
+    Default = false,
+    Callback = function(Value)
+        _G.PlayerESP = Value
     end
 })
 MainTab:Toggle({
@@ -567,7 +699,14 @@ MainTab:Toggle({
         _G.KillAura = Value
     end
 })
-
+MainTab:Toggle({
+    Title = "Fast Hunger",
+    Desc = "หิวเร็วขึ้น",
+    Default = false,
+    Callback = function(Value)
+        _G.FastHunger = Value
+    end
+})
 task.spawn(function()
     while true do
         task.wait(0.3)
