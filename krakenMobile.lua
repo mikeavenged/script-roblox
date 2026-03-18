@@ -97,6 +97,13 @@ task.spawn(function()
         
     end
 end)
+local function interact()
+    for _,v in pairs(workspace:GetDescendants()) do
+        if v:IsA("ProximityPrompt") then
+            fireproximityprompt(v, 0) -- กดทันที
+        end
+    end
+end
 
 local function getMyChar()
     return Workspace.Characters:FindFirstChild(LocalPlayer.Name) or LocalPlayer.Character
@@ -297,7 +304,7 @@ end
                         myRoot.CFrame = target.CFrame * CFrame.new(0, 40, 0)
                         hasTeleported = true
                     end
-                    pressKey(Enum.KeyCode.E)
+                    interact()
                 end
             elseif currentTask == "Drink" then
                 if tick() - foodToggleTime >= 10 then
@@ -312,7 +319,7 @@ end
                             myRoot.CFrame = target.CFrame * CFrame.new(0, 40, 0)
                             hasTeleported = true
                         end
-                        pressKey(Enum.KeyCode.E)
+                        interact()
                     end
                 else
                     local target = getClosestPart(Workspace.Interactions.Food, "Ribs", "Food")
@@ -326,7 +333,7 @@ myRoot.CFrame = CFrame.lookAt(telePos, lookPos)
 Camera.CFrame = CFrame.lookAt(Camera.CFrame.Position, lookPos)
                             hasTeleported = true
                         end
-                        pressKey(Enum.KeyCode.E)
+                        interact()
                     end
                 end
             elseif currentTask == "Sniff" then
