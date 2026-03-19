@@ -612,15 +612,6 @@ MainTab:Button({
         print("Collected all tokens")
     end
 })
-MainTab:Toggle({
-    Title = "Dash Speed",
-    Desc = "วิ่งพุ่งไว (กด Shift)",
-    Default = false,
-    Callback = function(Value)
-        _G.Dash = Value
-    end
-})
-
 local AutoFarmToggle = MainTab:Toggle({
     Title = "Auto Farm ",
     Desc = "ฟาร์มโหดๆ555 ",
@@ -632,6 +623,14 @@ local AutoFarmToggle = MainTab:Toggle({
             hasTeleported = false 
             lastPosBeforeAttack = nil
         end
+    end
+})
+MainTab:Toggle({
+    Title = "Dash Speed",
+    Desc = "วิ่งพุ่งไว (กด Shift)",
+    Default = false,
+    Callback = function(Value)
+        _G.Dash = Value
     end
 })
 local SelectedPlayer = nil
