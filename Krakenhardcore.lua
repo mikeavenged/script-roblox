@@ -205,15 +205,6 @@ local function clickMouse()
     VirtualInputManager:SendMouseButtonEvent(0, 0, 0, false, game, 0)
     task.wait(0.25)
 end
-local function walkTo(pos)
-    local char = getMyChar()
-    if not char then return end
-    
-    local humanoid = char:FindFirstChildOfClass("Humanoid")
-    if humanoid then
-        humanoid:MoveTo(pos)
-    end
-end
 
 task.spawn(function()
     while task.wait(0.2) do
@@ -405,11 +396,11 @@ end
                 local target = getClosest(Workspace.Interactions.Mud, "Mud")
                 if target then
                     if not hasTeleported then
-                        myRoot.CFrame = target.CFrame * CFrame.new(0, 25, 0)
+                        myRoot.CFrame = target.CFrame * CFrame.new(0, 40, 0)
                         hasTeleported = true
                     end
                     pressKey(Enum.KeyCode.E)
-                            task.wait(2) 
+                            task.wait(1)
                 end
             elseif currentTask == "Drink" then
                 if tick() - foodToggleTime >= 10 then
@@ -417,27 +408,15 @@ end
                     foodMode = (foodMode == "Water") and "Food" or "Water"
                     hasTeleported = false
                 end
-               if foodMode == "Water" then
-    local target = getClosest(Workspace.Interactions.Lakes, "SurfaceMask")
-    if target then
-        
-        local dist = (myRoot.Position - target.Position).Magnitude
-        
-        if dist > 100 then
-            -- 🛑 ไกลมาก → วาป
-            myRoot.CFrame = target.CFrame + Vector3.new(0, 5, 0)
-        
-        elseif dist > 15 then
-            -- 🚶 ระยะกลาง → เดิน
-            walkTo(target.Position)
-        
-        else
-            -- 💧 ใกล้แล้ว → ดื่ม
-            pressKey(Enum.KeyCode.E)
-        end
-        
-    end
-end
+                if foodMode == "Water" then
+                    local target = getClosest(Workspace.Interactions.Lakes, "SurfaceMask")
+                    if target then
+                        if not hasTeleported then
+                            myRoot.CFrame = target.CFrame * CFrame.new(0, 0.5, 0)
+                            hasTeleported = true
+                        end
+                        pressKey(Enum.KeyCode.E)
+                    end
                 else
                     local target = getClosestPart(Workspace.Interactions.Food, "Ribs", "Food")
                     if target then
