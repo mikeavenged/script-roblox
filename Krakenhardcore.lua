@@ -93,6 +93,7 @@ MainTab:Slider({
     Callback = function(Value)
         DashCooldown = Value
     end
+})
 
 local VirtualInputManager = game:GetService("VirtualInputManager")
 local Players = game:GetService("Players")
