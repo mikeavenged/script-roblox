@@ -400,6 +400,7 @@ end
                         hasTeleported = true
                     end
                     pressKey(Enum.KeyCode.E)
+                            task.wait(2) 
                 end
             elseif currentTask == "Drink" then
                 if tick() - foodToggleTime >= 10 then
