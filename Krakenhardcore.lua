@@ -26,7 +26,7 @@ local Window = WindUI:CreateWindow({
     Background =  nil,
     BackgroundImageTransparency = 0.98,
     HideSearchBar = true,
-    ScrollBarEnabled = false,
+    ScrollBarEnabled = true,
 })
 Window:Tag({
     Title = "Map : Creature of Sonaria ",
@@ -62,6 +62,37 @@ local MainTab = Window:Tab({
 MainTab:Section({
     Title = "// Main "
 })
+MainTab:Toggle({
+    Title = "Dash",
+    Desc = "เปิด / ปิด Dash (กด Shift)",
+    Default = false,
+    Callback = function(Value)
+        _G.Dash = Value
+    end
+})
+MainTab:Slider({
+    Title = "Dash Speed Power",
+    Desc = "ปรับความแรง Dash",
+    Value = {
+        Min = 50,
+        Max = 300,
+        Default = 150
+    },
+    Callback = function(Value)
+        DashSpeed = Value
+    end
+})
+MainTab:Slider({
+    Title = "Dash Cooldown",
+    Desc = "เวลาหน่วง Dash",
+    Value = {
+        Min = 0,
+        Max = 3,
+        Default = 1
+    },
+    Callback = function(Value)
+        DashCooldown = Value
+    end
 
 local VirtualInputManager = game:GetService("VirtualInputManager")
 local Players = game:GetService("Players")
@@ -625,38 +656,7 @@ local AutoFarmToggle = MainTab:Toggle({
         end
     end
 })
-MainTab:Toggle({
-    Title = "Dash",
-    Desc = "เปิด / ปิด Dash (กด Shift)",
-    Default = false,
-    Callback = function(Value)
-        _G.Dash = Value
-    end
-})
-MainTab:Slider({
-    Title = "Dash Speed Power",
-    Desc = "ปรับความแรง Dash",
-    Value = {
-        Min = 50,
-        Max = 300,
-        Default = 150
-    },
-    Callback = function(Value)
-        DashSpeed = Value
-    end
-})
-MainTab:Slider({
-    Title = "Dash Cooldown",
-    Desc = "เวลาหน่วง Dash",
-    Value = {
-        Min = 0,
-        Max = 3,
-        Default = 1
-    },
-    Callback = function(Value)
-        DashCooldown = Value
-    end
-})
+
 local SelectedPlayer = nil
 
 MainTab:Dropdown({
