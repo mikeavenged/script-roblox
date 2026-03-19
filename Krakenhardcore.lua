@@ -76,6 +76,39 @@ _G.KillAura = false
 _G.PlayerESP = false
 _G.FastHunger = false
 _G.AutoShoom = false
+-- ================== Dash System ================== --
+_G.Dash = false
+local DashSpeed = 150 -- ปรับความแรงได้ (100-300)
+local DashCooldown = 1 -- วินาที
+
+local UIS = game:GetService("UserInputService")
+local lastDash = 0
+
+local function Dash()
+    if tick() - lastDash < DashCooldown then return end
+    lastDash = tick()
+    
+    local char = LocalPlayer.Character
+    if not char then return end
+    
+    local root = char:FindFirstChild("HumanoidRootPart")
+    if not root then return end
+    
+    local bv = Instance.new("BodyVelocity")
+    bv.MaxForce = Vector3.new(999999,0,999999)
+    bv.Velocity = root.CFrame.LookVector * DashSpeed
+    bv.Parent = root
+    
+    game.Debris:AddItem(bv, 0.2)
+end
+
+-- กด Shift เพื่อ Dash
+UIS.InputBegan:Connect(function(input, gpe)
+    if gpe then return end
+    if _G.Dash and input.KeyCode == Enum.KeyCode.LeftShift then
+        Dash()
+    end
+end)
 
 task.spawn(function()
     while task.wait(0.05) do
@@ -577,6 +610,14 @@ MainTab:Button({
         end
         
         print("Collected all tokens")
+    end
+})
+MainTab:Toggle({
+    Title = "Dash Speed",
+    Desc = "วิ่งพุ่งไว (กด Shift)",
+    Default = false,
+    Callback = function(Value)
+        _G.Dash = Value
     end
 })
 
