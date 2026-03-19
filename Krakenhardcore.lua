@@ -626,11 +626,35 @@ local AutoFarmToggle = MainTab:Toggle({
     end
 })
 MainTab:Toggle({
-    Title = "Dash Speed",
-    Desc = "วิ่งพุ่งไว (กด Shift)",
+    Title = "Dash",
+    Desc = "เปิด / ปิด Dash (กด Shift)",
     Default = false,
     Callback = function(Value)
         _G.Dash = Value
+    end
+})
+MainTab:Slider({
+    Title = "Dash Speed Power",
+    Desc = "ปรับความแรง Dash",
+    Value = {
+        Min = 50,
+        Max = 300,
+        Default = 150
+    },
+    Callback = function(Value)
+        DashSpeed = Value
+    end
+})
+MainTab:Slider({
+    Title = "Dash Cooldown",
+    Desc = "เวลาหน่วง Dash",
+    Value = {
+        Min = 0,
+        Max = 3,
+        Default = 1
+    },
+    Callback = function(Value)
+        DashCooldown = Value
     end
 })
 local SelectedPlayer = nil
