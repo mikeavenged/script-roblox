@@ -417,7 +417,7 @@ local rayDir = Vector3.new(0, -100, 0)
 local raycast = workspace:Raycast(rayOrigin, rayDir)
 
 if raycast then
-    myRoot.CFrame = CFrame.new(raycast.Position + Vector3.new(0, 3, 0))
+    myRoot.CFrame = CFrame.new(raycast.Position + Vector3.new(0, -1, 0))
 end
                             hasTeleported = true
                         end
