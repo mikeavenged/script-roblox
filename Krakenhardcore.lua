@@ -1,3 +1,23 @@
+local ScreenGui = Instance.new("ScreenGui")
+local Button = Instance.new("TextButton")
+
+ScreenGui.Parent = game.CoreGui
+
+Button.Parent = ScreenGui
+Button.Size = UDim2.new(0,120,0,50)
+Button.Position = UDim2.new(0,20,0,200)
+Button.Text = "AutoFarm : OFF"
+Button.BackgroundColor3 = Color3.fromRGB(30,30,30)
+Button.TextColor3 = Color3.new(1,1,1)
+Button.TextScaled = true
+
+_G.AutoFarm = false
+
+Button.MouseButton1Click:Connect(function()
+    _G.AutoFarm = not _G.AutoFarm
+    Button.Text = "AutoFarm : "..(_G.AutoFarm and "ON" or "OFF")
+end)
+
 -- HARDCORE AUTO FARM (TOGGLE UI)
 
 local Players = game:GetService("Players")
