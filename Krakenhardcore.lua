@@ -411,7 +411,14 @@ end
                     local target = getClosest(Workspace.Interactions.Lakes, "SurfaceMask")
                     if target then
                         if not hasTeleported then
-                            myRoot.CFrame = target.CFrame * CFrame.new(0, 0, 0)
+                           local rayOrigin = target.Position + Vector3.new(0, 50, 0)
+local rayDir = Vector3.new(0, -100, 0)
+
+local raycast = workspace:Raycast(rayOrigin, rayDir)
+
+if raycast then
+    myRoot.CFrame = CFrame.new(raycast.Position + Vector3.new(0, 3, 0))
+end
                             hasTeleported = true
                         end
                         pressKey(Enum.KeyCode.E)
