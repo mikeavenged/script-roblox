@@ -26,7 +26,7 @@ local Window = WindUI:CreateWindow({
     Background =  nil,
     BackgroundImageTransparency = 0.98,
     HideSearchBar = true,
-    ScrollBarEnabled = true,
+    ScrollBarEnabled = false,
 })
 Window:Tag({
     Title = "Map : Creature of Sonaria ",
@@ -62,38 +62,6 @@ local MainTab = Window:Tab({
 MainTab:Section({
     Title = "// Main "
 })
-MainTab:Toggle({
-    Title = "Dash",
-    Desc = "เปิด / ปิด Dash (กด Shift)",
-    Default = false,
-    Callback = function(Value)
-        _G.Dash = Value
-    end
-})
-MainTab:Slider({
-    Title = "Dash Speed Power",
-    Desc = "ปรับความแรง Dash",
-    Value = {
-        Min = 50,
-        Max = 300,
-        Default = 150
-    },
-    Callback = function(Value)
-        DashSpeed = Value
-    end
-})
-MainTab:Slider({
-    Title = "Dash Cooldown",
-    Desc = "เวลาหน่วง Dash",
-    Value = {
-        Min = 0,
-        Max = 3,
-        Default = 1
-    },
-    Callback = function(Value)
-        DashCooldown = Value
-    end
-})
 
 local VirtualInputManager = game:GetService("VirtualInputManager")
 local Players = game:GetService("Players")
@@ -108,37 +76,40 @@ _G.KillAura = false
 _G.PlayerESP = false
 _G.FastHunger = false
 _G.AutoShoom = false
--- ================== Dash System ================== --
-_G.Dash = false
-local DashSpeed = 150 -- ปรับความแรงได้ (100-300)
-local DashCooldown = 1 -- วินาที
+_G.SpeedHack = false
+_G.SpeedValue = 5 -- ปรับความแรง (แนะนำ 3 - 10)
 
 local UIS = game:GetService("UserInputService")
-local lastDash = 0
 
-local function Dash()
-    if tick() - lastDash < DashCooldown then return end
-    lastDash = tick()
-    
-    local char = LocalPlayer.Character
-    if not char then return end
-    
-    local root = char:FindFirstChild("HumanoidRootPart")
-    if not root then return end
-    
-    local bv = Instance.new("BodyVelocity")
-    bv.MaxForce = Vector3.new(999999,0,999999)
-    bv.Velocity = root.CFrame.LookVector * DashSpeed
-    bv.Parent = root
-    
-    game.Debris:AddItem(bv, 0.2)
-end
-
--- กด Shift เพื่อ Dash
-UIS.InputBegan:Connect(function(input, gpe)
-    if gpe then return end
-    if _G.Dash and input.KeyCode == Enum.KeyCode.LeftShift then
-        Dash()
+task.spawn(function()
+    while task.wait(0.03) do
+        if not _G.SpeedHack then continue end
+        
+        local char = game.Players.LocalPlayer.Character
+        if not char then continue end
+        
+        local root = char:FindFirstChild("HumanoidRootPart")
+        if not root then continue end
+        
+        -- เช็คว่ากดปุ่มเดินไหม
+        local moveDir = Vector3.zero
+        
+        if UIS:IsKeyDown(Enum.KeyCode.W) then
+            moveDir = moveDir + workspace.CurrentCamera.CFrame.LookVector
+        end
+        if UIS:IsKeyDown(Enum.KeyCode.S) then
+            moveDir = moveDir - workspace.CurrentCamera.CFrame.LookVector
+        end
+        if UIS:IsKeyDown(Enum.KeyCode.A) then
+            moveDir = moveDir - workspace.CurrentCamera.CFrame.RightVector
+        end
+        if UIS:IsKeyDown(Enum.KeyCode.D) then
+            moveDir = moveDir + workspace.CurrentCamera.CFrame.RightVector
+        end
+        
+        if moveDir.Magnitude > 0 then
+            root.CFrame = root.CFrame + (moveDir.Unit * _G.SpeedValue)
+        end
     end
 end)
 
@@ -644,6 +615,7 @@ MainTab:Button({
         print("Collected all tokens")
     end
 })
+
 local AutoFarmToggle = MainTab:Toggle({
     Title = "Auto Farm ",
     Desc = "ฟาร์มโหดๆ555 ",
@@ -657,7 +629,6 @@ local AutoFarmToggle = MainTab:Toggle({
         end
     end
 })
-
 local SelectedPlayer = nil
 
 MainTab:Dropdown({
@@ -710,49 +681,10 @@ MainTab:Toggle({
     end
 })
 MainTab:Toggle({
-    Title = "Fast Hunger",
-    Desc = "หิวเร็วขึ้น",
+    Title = "Speed Hack (Real)",
+    Desc = "วิ่งไวแบบใช้ได้จริง",
     Default = false,
     Callback = function(Value)
-        _G.FastHunger = Value
+        _G.SpeedHack = Value
     end
 })
-task.spawn(function()
-    while true do
-        task.wait(0.3)
-
-        if not _G.KillPlayer then
-            continue
-        end
-
-        if not SelectedPlayer then
-            continue
-        end
-        
-        local target = game.Players:FindFirstChild(SelectedPlayer)
-        if not target then
-            continue
-        end
-        
-        local myChar = game.Players.LocalPlayer.Character
-        local enemyChar = target.Character
-        
-        if not myChar or not enemyChar then
-            continue
-        end
-        
-        local myRoot = myChar:FindFirstChild("HumanoidRootPart")
-        local enemyRoot = enemyChar:FindFirstChild("HumanoidRootPart")
-        
-        if not myRoot or not enemyRoot then
-            continue
-        end
-
-        myRoot.CFrame = enemyRoot.CFrame * CFrame.new(0,0,2)
-
-        VirtualInputManager:SendMouseButtonEvent(0,0,0,true,game,0)
-        task.wait(0.05)
-        VirtualInputManager:SendMouseButtonEvent(0,0,0,false,game,0)
-
-    end
-end)
