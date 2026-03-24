@@ -114,32 +114,29 @@ task.spawn(function()
 end)
 
 task.spawn(function()
-    while task.wait(0.05) do
+    while task.wait(0.1) do -- ทำงานทุก 0.1 วินาที เพื่อความเนียน
         if not _G.FastHunger then continue end
         
-        local player = game.Players.LocalPlayer
-        local gui = player:FindFirstChild("PlayerGui")
-        
-        if gui and gui:FindFirstChild("HUDGui") then
+        pcall(function()
+            local player = game.Players.LocalPlayer
+            local stats = player.PlayerGui.HUDGui.StatsFrame
             
-            local stats = gui.HUDGui:FindFirstChild("StatsFrame")
+            local hunger = stats:FindFirstChild("Hunger")
+            local thirst = stats:FindFirstChild("Thirst")
             
-            if stats then
-                
-                local hunger = stats:FindFirstChild("Hunger")
-                local thirst = stats:FindFirstChild("Thirst")
-                
-                if hunger and hunger:FindFirstChild("Value") then
-                    hunger.Value.Value = hunger.Value.Value - 50
+            -- ลดค่าทีละ 2 (ปรับตัวเลขนี้ได้ ถ้าอยากให้หิวเร็วขึ้นอีก)
+            if hunger and hunger:FindFirstChild("Value") then
+                if hunger.Value.Value > 0 then
+                    hunger.Value.Value = hunger.Value.Value - 2
                 end
-                
-                if thirst and thirst:FindFirstChild("Value") then
-                    thirst.Value.Value = thirst.Value.Value - 50
-                end
-                
             end
             
-        end
+            if thirst and thirst:FindFirstChild("Value") then
+                if thirst.Value.Value > 0 then
+                    thirst.Value.Value = thirst.Value.Value - 2
+                end
+            end
+        end)
     end
 end)
 local function createESP(player)
@@ -686,5 +683,13 @@ MainTab:Toggle({
     Default = false,
     Callback = function(Value)
         _G.SpeedHack = Value
+    end
+})
+MainTab:Toggle({
+    Title = "Fast Hunger & Thirst",
+    Desc = "เร่งความหิวและกระหาย (ใช้สำหรับทำเควสกินอาหาร)",
+    Default = false,
+    Callback = function(Value)
+        _G.FastHunger = Value
     end
 })
