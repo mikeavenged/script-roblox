@@ -79,92 +79,70 @@ _G.SpeedHack = false
 _G.AntiBoneBreak = false
 _G.SpeedValue = 5 -- ปรับความแรง (แนะนำ 3 - 10)
 _G.UnlimitedBreath = false
+-- ================== Ultimate Fix Logic ================== --
 task.spawn(function()
-    while task.wait() do -- ปรับให้ทำงานเร็วขึ้น (Step เดียวกับ Render)
-        if not _G.UnlimitedBreath then continue end
-        
+    while task.wait(0.2) do
         pcall(function()
-            local char = game.Players.LocalPlayer.Character
-            if char then
-                -- 1. เติมค่าในโมเดลตัวละครโดยตรง (คลุมทุกจุดที่น่าจะเป็นไปได้)
+            local player = game.Players.LocalPlayer
+            local char = player.Character
+            if not char then return end
+
+            -- 1. จัดการ Unlimited Breath (เน้นไปที่ Stamina ของโมเดล)
+            if _G.UnlimitedBreath then
+                -- ดึง Attributes ทั้งหมดของตัวละครมาเช็ค (CoS ชอบใช้ชื่อเฉพาะ)
+                for name, value in pairs(char:GetAttributes()) do
+                    if string.find(name:lower(), "stamina") or string.find(name:lower(), "breath") then
+                        char:SetAttribute(name, 100) -- ล็อคให้เต็ม 100 ตลอด
+                    end
+                end
+                
+                -- สแกนหา Object ในตัวละคร (กันเหนียว)
                 for _, v in pairs(char:GetDescendants()) do
-                    if v:IsA("NumberValue") or v:IsA("DoubleConstrainedValue") then
-                        if string.find(v.Name:lower(), "breath") or string.find(v.Name:lower(), "stamina") then
-                            v.Value = 100 -- สำหรับ NumberValue
-                            if v:IsA("DoubleConstrainedValue") then
-                                v.Value = v.MaxValue -- สำหรับค่าที่มี Max กำกับ
-                            end
+                    if v:IsA("NumberValue") and (v.Name:lower():find("breath") or v.Name:lower():find("stamina")) then
+                        v.Value = 100
+                    end
+                end
+            end
+
+            -- 2. จัดการ Anti Bone Break (ลบทุกสถานะที่ทำให้ช้าลง)
+            if _G.AntiBoneBreak then
+                -- มองหาโฟลเดอร์สถานะใน Workspace > Characters > [ชื่อเรา]
+                local status = char:FindFirstChild("StatusEffects") or char:FindFirstChild("Effects")
+                if status then
+                    for _, effect in pairs(status:GetChildren()) do
+                        -- ลบทุกอย่างที่มีผลกับกระดูกหรือความเร็ว
+                        local n = effect.Name:lower()
+                        if n:find("bone") or n:find("broken") or n:find("injury") or n:find("wound") or n:find("tear") or n:find("bleed") then
+                            effect:Destroy()
                         end
                     end
                 end
                 
-                -- 2. จัดการผ่าน Attribute (CoS รุ่นใหม่ชอบเก็บค่าไว้ในนี้)
-                local attributes = char:GetAttributes()
-                for name, value in pairs(attributes) do
-                    if string.find(name:lower(), "breath") or string.find(name:lower(), "stamina") then
-                        char:SetAttribute(name, 100)
-                    end
-                end
-            end
-            
-            -- 3. ล็อคค่าใน UI (เพื่อให้หลอดดูเต็มตลอดเวลา)
-            local playerGui = game.Players.LocalPlayer:FindFirstChild("PlayerGui")
-            if playerGui and playerGui:FindFirstChild("HUDGui") then
-                for _, v in pairs(playerGui.HUDGui:GetDescendants()) do
-                    if v.Name == "Value" and v.Parent:IsA("Frame") and 
-                      (string.find(v.Parent.Name:lower(), "breath") or string.find(v.Parent.Name:lower(), "stamina")) then
-                        v.Value = 100
+                -- ล้าง Attributes สถานะลบ
+                for name, _ in pairs(char:GetAttributes()) do
+                    local n = name:lower()
+                    if n:find("broken") or n:find("injury") or n:find("bleeding") then
+                        char:SetAttribute(name, 0)
+                        char:SetAttribute(name, false)
                     end
                 end
             end
         end)
     end
 end)
--- ================== Anti Bone Break Logic ================== --
--- ================== Advanced Anti-Injury Logic ================== --
+
+-- 3. ระบบ Bypass Movement (สำหรับกระดูกแตกแล้วเดินไม่ออก)
 task.spawn(function()
-    while task.wait(0.1) do -- ตรวจสอบรัวๆ ทุก 0.1 วินาที
-        if not _G.AntiBoneBreak then continue end
-        
-        pcall(function()
-            local char = game.Players.LocalPlayer.Character
-            if char then
-                -- 1. ตรวจสอบใน Status Effects Folder (ที่ CoS มักจะใช้)
-                local statusFolder = char:FindFirstChild("StatusEffects") or char:FindFirstChild("Effects")
-                if statusFolder then
-                    for _, effect in pairs(statusFolder:GetChildren()) do
-                        local name = effect.Name:lower()
-                        if string.find(name, "bone") or string.find(name, "wound") or string.find(name, "injury") or string.find(name, "tear") then
-                            effect:Destroy() -- ลบสถานะทิ้งทันที
-                        end
-                    end
+    while task.wait(0.5) do
+        if _G.AntiBoneBreak then
+            pcall(function()
+                local hum = game.Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+                if hum then
+                    hum.WalkSpeed = 16 -- บังคับความเร็วเดินพื้นฐานตลอดเวลา
+                    hum.JumpPower = 50 -- บังคับการกระโดด
                 end
-
-                -- 2. เคลียร์ค่าใน Attributes (วิธีใหม่ที่เกมชอบใช้)
-                local attrs = char:GetAttributes()
-                for attrName, _ in pairs(attrs) do
-                    local name = attrName:lower()
-                    if string.find(name, "broken") or string.find(name, "injured") or string.find(name, "bleeding") then
-                        char:SetAttribute(attrName, 0) -- ปรับค่าความเสียหายเป็น 0
-                        char:SetAttribute(attrName, false) -- ปรับสถานะเป็น False
-                    end
-                end
-
-                -- 3. สแกนหา NumberValue/BoolValue ทั่วตัวละคร (กันเหนียว)
-                for _, v in pairs(char:GetDescendants()) do
-                    if v:IsA("ValueBase") then
-                        local vName = v.Name:lower()
-                        if string.find(vName, "broken") or string.find(vName, "injury") then
-                            if v:IsA("NumberValue") or v:IsA("IntValue") then
-                                v.Value = 0
-                            elseif v:IsA("BoolValue") then
-                                v.Value = false
-                            end
-                        end
-                    end
-                end
-            end
-        end)
+            end)
+        end
     end
 end)
 local UIS = game:GetService("UserInputService")
