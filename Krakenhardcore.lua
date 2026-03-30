@@ -79,6 +79,34 @@ _G.AutoShoom = false
 _G.SpeedHack = false
 _G.AntiBoneBreak = false
 _G.SpeedValue = 5 -- ปรับความแรง (แนะนำ 3 - 10)
+_G.UnlimitedBreath = false
+task.spawn(function()
+    while task.wait(0.1) do
+        if not _G.UnlimitedBreath then continue end
+        
+        pcall(function()
+            local player = game.Players.LocalPlayer
+            local char = player.Character
+            
+            -- วิธีที่ 1: จัดการผ่าน Value ในตัวละคร (สำหรับบางสายพันธุ์)
+            if char then
+                local abilities = char:FindFirstChild("Abilities") or char
+                for _, v in pairs(abilities:GetDescendants()) do
+                    if v:IsA("NumberValue") and (string.find(v.Name:lower(), "breath") or string.find(v.Name:lower(), "stamina")) then
+                        v.Value = 100 -- เติมให้เต็มตลอด
+                    end
+                end
+            end
+            
+            -- วิธีที่ 2: จัดการผ่าน HUD (เพื่อให้หลอดไม่ลด)
+            local stats = player.PlayerGui.HUDGui.StatsFrame
+            local breathBar = stats:FindFirstChild("Breath") or stats:FindFirstChild("Stamina")
+            if breathBar and breathBar:FindFirstChild("Value") then
+                breathBar.Value.Value = 100
+            end
+        end)
+    end
+end)
 -- ================== Anti Bone Break Logic ================== --
 task.spawn(function()
     while task.wait(0.5) do
@@ -692,11 +720,11 @@ MainTab:Toggle({
     end
 })
 MainTab:Toggle({
-    Title = "Kill Aura",
-    Desc = "ตีทุกคนในระยะ",
+    Title = "Unlimited Breath / Stamina",
+    Desc = "พ่นพลังได้รัวๆ และวิ่งได้ไม่เหนื่อย",
     Default = false,
     Callback = function(Value)
-        _G.KillAura = Value
+        _G.UnlimitedBreath = Value
     end
 })
 MainTab:Toggle({
