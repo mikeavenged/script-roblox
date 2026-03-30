@@ -77,7 +77,29 @@ _G.PlayerESP = false
 _G.FastHunger = false
 _G.AutoShoom = false
 _G.SpeedHack = false
+_G.AntiBoneBreak = false
 _G.SpeedValue = 5 -- ปรับความแรง (แนะนำ 3 - 10)
+-- ================== Anti Bone Break Logic ================== --
+task.spawn(function()
+    while task.wait(0.5) do
+        if not _G.AntiBoneBreak then continue end
+        
+        pcall(function()
+            local char = game.Players.LocalPlayer.Character
+            if char then
+                -- ตรวจสอบในตัวละครว่ามีสถานะบาดเจ็บไหม (อ้างอิงตามโครงสร้างเกม CoS)
+                for _, v in pairs(char:GetDescendants()) do
+                    if v:IsA("NumberValue") or v:IsA("BoolValue") then
+                        if string.find(v.Name:lower(), "brokenbone") or string.find(v.Name:lower(), "injury") then
+                            v.Value = 0 -- รีเซ็ตค่าความเสียหาย
+                            -- หรือถ้าเป็น Object ให้ใช้ v:Destroy() หากเกมใช้การสร้าง Instance มาใส่
+                        end
+                    end
+                end
+            end
+        end)
+    end
+end)
 
 local UIS = game:GetService("UserInputService")
 
@@ -686,10 +708,10 @@ MainTab:Toggle({
     end
 })
 MainTab:Toggle({
-    Title = "Fast Hunger & Thirst",
-    Desc = "เร่งความหิวและกระหาย (ใช้สำหรับทำเควสกินอาหาร)",
+    Title = "Anti Bone Break",
+    Desc = "ป้องกันกระดูกแตก / อาการบาดเจ็บ",
     Default = false,
     Callback = function(Value)
-        _G.FastHunger = Value
+        _G.AntiBoneBreak = Value
     end
 })
