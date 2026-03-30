@@ -72,7 +72,6 @@ local AttackRemote = game.ReplicatedStorage:FindFirstChild("Attack")
 
 _G.RemoteAttack = false
 _G.Hitbox = false
-_G.KillAura = false
 _G.PlayerESP = false
 _G.FastHunger = false
 _G.AutoShoom = false
@@ -316,45 +315,6 @@ task.spawn(function()
     end
 end)
 
-local radius = 800
-
-task.spawn(function()
-    while task.wait(0.15) do
-             if not _G.KillAura then
-            continue
-        end
-
-        for _,v in pairs(Players:GetPlayers()) do
-            if v ~= LocalPlayer then
-                
-                local char = v.Character
-                local myChar = LocalPlayer.Character
-                
-                if char and myChar
-                and char:FindFirstChild("HumanoidRootPart")
-                and myChar:FindFirstChild("HumanoidRootPart") then
-                    
-                    local dist = (char.HumanoidRootPart.Position - myChar.HumanoidRootPart.Position).Magnitude
-                    
-                    if dist <= radius then
-                        
-                        local enemyPos = char.HumanoidRootPart.Position
-                        local myRoot = myChar.HumanoidRootPart
-                        
-                        myRoot.CFrame =
-                            CFrame.lookAt(
-                                enemyPos + Vector3.new(0,2,3),
-                                enemyPos
-                            )
-
-                        clickMouse()
-                    end
-                    
-                end
-            end
-        end
-    end
-end)
 
 _G.AutoFarm = false
 local currentTask = nil 
