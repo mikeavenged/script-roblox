@@ -315,7 +315,7 @@ task.spawn(function()
 
                     if _G.Hitbox then
                         -- เปิด Hitbox
-                        root.Size = Vector3.new(2000,2000,2000)
+                        root.Size = Vector3.new(300,300,300)
                         root.Transparency = 0.6
                         root.CanCollide = false
                         root.Massless = true
