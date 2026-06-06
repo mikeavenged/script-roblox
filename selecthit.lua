@@ -1,3 +1,10 @@
+local lakesFolder = workspace.Interactions.Lakes
+for _, object in pairs(lakesFolder:GetDescendants()) do
+    if object:IsA("BasePart") then
+        object.CanCollide = true
+    end
+end
+
 
 -- ================== Windows  ================== --
 local WindUI = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"))()
@@ -32,6 +39,11 @@ Window:SetToggleKey(Enum.KeyCode.X)
 
 
 
+-- ================== ConfigFile  ================== --
+local ConfigManager = Window.ConfigManager
+local MyConfig = ConfigManager:CreateConfig("DefaultConfig")
+-- ================== ConfigFile  ================== --
+
 
 
 
@@ -43,41 +55,156 @@ local MainTab = Window:Tab({
     Locked = false,
 })
 
+-- ================== Tab  ================== --
+
+
 
 MainTab:Section({
     Title = "// Main "
 })
 
+local VirtualInputManager = game:GetService("VirtualInputManager")
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 local Workspace = game:GetService("Workspace")
-local HitboxPlayer = nil
-local function FindPlayerByText(text)
-    if not text or text == "" then
-        return nil
-    end
+local Camera = Workspace.CurrentCamera
+local AttackRemote = game.ReplicatedStorage:FindFirstChild("Attack")
 
-    text = text:lower()
-
-    for _,plr in ipairs(Players:GetPlayers()) do
-        if plr ~= LocalPlayer then
-            if plr.Name:lower():find(text, 1, true) then
-                return plr
-            end
-        end
-    end
-
-    return nil
-end
-
-
+_G.RemoteAttack = false
 _G.Hitbox = false
 _G.PlayerESP = false
+_G.FastHunger = false
+_G.AutoShoom = false
 _G.SpeedHack = false
+_G.AntiBoneBreak = false
 _G.SpeedValue = 5 -- ปรับความแรง (แนะนำ 3 - 10)
+_G.UnlimitedBreath = false
+-- ================== Ultimate Fix Logic ================== --
+task.spawn(function()
+    while task.wait(0.2) do
+        pcall(function()
+            local player = game.Players.LocalPlayer
+            local char = player.Character
+            if not char then return end
 
+            -- 1. จัดการ Unlimited Breath (เน้นไปที่ Stamina ของโมเดล)
+            if _G.UnlimitedBreath then
+                -- ดึง Attributes ทั้งหมดของตัวละครมาเช็ค (CoS ชอบใช้ชื่อเฉพาะ)
+                for name, value in pairs(char:GetAttributes()) do
+                    if string.find(name:lower(), "stamina") or string.find(name:lower(), "breath") then
+                        char:SetAttribute(name, 100) -- ล็อคให้เต็ม 100 ตลอด
+                    end
+                end
+                
+                -- สแกนหา Object ในตัวละคร (กันเหนียว)
+                for _, v in pairs(char:GetDescendants()) do
+                    if v:IsA("NumberValue") and (v.Name:lower():find("breath") or v.Name:lower():find("stamina")) then
+                        v.Value = 100
+                    end
+                end
+            end
 
+            -- 2. จัดการ Anti Bone Break (ลบทุกสถานะที่ทำให้ช้าลง)
+            if _G.AntiBoneBreak then
+                -- มองหาโฟลเดอร์สถานะใน Workspace > Characters > [ชื่อเรา]
+                local status = char:FindFirstChild("StatusEffects") or char:FindFirstChild("Effects")
+                if status then
+                    for _, effect in pairs(status:GetChildren()) do
+                        -- ลบทุกอย่างที่มีผลกับกระดูกหรือความเร็ว
+                        local n = effect.Name:lower()
+                        if n:find("bone") or n:find("broken") or n:find("injury") or n:find("wound") or n:find("tear") or n:find("bleed") then
+                            effect:Destroy()
+                        end
+                    end
+                end
+                
+                -- ล้าง Attributes สถานะลบ
+                for name, _ in pairs(char:GetAttributes()) do
+                    local n = name:lower()
+                    if n:find("broken") or n:find("injury") or n:find("bleeding") then
+                        char:SetAttribute(name, 0)
+                        char:SetAttribute(name, false)
+                    end
+                end
+            end
+        end)
+    end
+end)
 
+-- 3. ระบบ Bypass Movement (สำหรับกระดูกแตกแล้วเดินไม่ออก)
+task.spawn(function()
+    while task.wait(0.5) do
+        if _G.AntiBoneBreak then
+            pcall(function()
+                local hum = game.Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+                if hum then
+                    hum.WalkSpeed = 16 -- บังคับความเร็วเดินพื้นฐานตลอดเวลา
+                    hum.JumpPower = 50 -- บังคับการกระโดด
+                end
+            end)
+        end
+    end
+end)
+local UIS = game:GetService("UserInputService")
+
+task.spawn(function()
+    while task.wait(0.03) do
+        if not _G.SpeedHack then continue end
+        
+        local char = game.Players.LocalPlayer.Character
+        if not char then continue end
+        
+        local root = char:FindFirstChild("HumanoidRootPart")
+        if not root then continue end
+        
+        -- เช็คว่ากดปุ่มเดินไหม
+        local moveDir = Vector3.zero
+        
+        if UIS:IsKeyDown(Enum.KeyCode.W) then
+            moveDir = moveDir + workspace.CurrentCamera.CFrame.LookVector
+        end
+        if UIS:IsKeyDown(Enum.KeyCode.S) then
+            moveDir = moveDir - workspace.CurrentCamera.CFrame.LookVector
+        end
+        if UIS:IsKeyDown(Enum.KeyCode.A) then
+            moveDir = moveDir - workspace.CurrentCamera.CFrame.RightVector
+        end
+        if UIS:IsKeyDown(Enum.KeyCode.D) then
+            moveDir = moveDir + workspace.CurrentCamera.CFrame.RightVector
+        end
+        
+        if moveDir.Magnitude > 0 then
+            root.CFrame = root.CFrame + (moveDir.Unit * _G.SpeedValue)
+        end
+    end
+end)
+
+task.spawn(function()
+    while task.wait(0.1) do -- ทำงานทุก 0.1 วินาที เพื่อความเนียน
+        if not _G.FastHunger then continue end
+        
+        pcall(function()
+            local player = game.Players.LocalPlayer
+            local stats = player.PlayerGui.HUDGui.StatsFrame
+            
+            local hunger = stats:FindFirstChild("Hunger")
+            local thirst = stats:FindFirstChild("Thirst")
+            
+            -- ลดค่าทีละ 2 (ปรับตัวเลขนี้ได้ ถ้าอยากให้หิวเร็วขึ้นอีก)
+            if hunger and hunger:FindFirstChild("Value") then
+                if hunger.Value.Value > 0 then
+                    hunger.Value.Value = hunger.Value.Value - 2
+                end
+            end
+            
+            if thirst and thirst:FindFirstChild("Value") then
+                if thirst.Value.Value > 0 then
+                    thirst.Value.Value = thirst.Value.Value - 2
+                end
+            end
+        end)
+    end
+end)
 local function createESP(player)
     if player == LocalPlayer then return end
     
@@ -135,40 +262,271 @@ end)
 
 
 task.spawn(function()
-    while task.wait(0.5) do
+    while task.wait(0.1) do
+        
+        if not _G.RemoteAttack then
+            continue
+        end
+        
+        if AttackRemote then
+            for _,v in pairs(Players:GetPlayers()) do
+                if v ~= LocalPlayer then
+                    
+                    local char = v.Character
+                    if char and char:FindFirstChild("HumanoidRootPart") then
+                        AttackRemote:FireServer(
+                            char,
+                            char.HumanoidRootPart.Position
+                        )
+                    end
+                    
+                end
+            end
+        end
+        
+    end
+end)
 
-        local targetPlayer = FindPlayerByText(HitboxPlayer)
+local function getMyChar()
+    return Workspace.Characters:FindFirstChild(LocalPlayer.Name) or LocalPlayer.Character
+end
 
+local function pressKey(keyCode)
+    VirtualInputManager:SendKeyEvent(true, keyCode, false, game)
+    task.wait(0.25)
+    VirtualInputManager:SendKeyEvent(false, keyCode, false, game)
+    task.wait(0.25)
+end
+
+local function clickMouse()
+    VirtualInputManager:SendMouseButtonEvent(0, 0, 0, true, game, 0)
+    task.wait(0.25)
+    VirtualInputManager:SendMouseButtonEvent(0, 0, 0, false, game, 0)
+    task.wait(0.25)
+end
+
+task.spawn(function()
+    while task.wait(0.2) do
         for _,char in pairs(Workspace.Characters:GetChildren()) do
+            if char ~= getMyChar() then
 
-            local root = char:FindFirstChild("HumanoidRootPart")
-            if not root then
-                continue
+                local root = char:FindFirstChild("HumanoidRootPart")
+                if root then
+
+                    local enableHitbox = false
+
+                    local player = Players:FindFirstChild(char.Name)
+
+                    if _G.Hitbox and player then
+                        if string.find(
+                            string.lower(player.Name),
+                            string.lower(_G.HitboxPlayer)
+                        ) then
+                            enableHitbox = true
+                        end
+                    end
+
+                    if enableHitbox then
+                        root.Size = Vector3.new(100,300,100)
+                        root.Transparency = 0.6
+                        root.CanCollide = false
+                        root.Massless = true
+                    else
+                        root.Size = Vector3.new(2,2,1)
+                        root.Transparency = 1
+                        root.CanCollide = true
+                    end
+
+                end
             end
-
-          if targetPlayer
-and targetPlayer ~= LocalPlayer
-and targetPlayer.Character
-and char == targetPlayer.Character
-and _G.Hitbox then
-
-                root.Size = Vector3.new(100,200,100)
-                root.Transparency = 0.6
-                root.CanCollide = false
-                root.Massless = true
-
-            else
-
-                root.Size = Vector3.new(2,2,1)
-                root.Transparency = 1
-                root.CanCollide = true
-
-            end
-
         end
     end
 end)
 
+_G.AutoFarm = false
+local currentTask = nil 
+local hasTeleported = false 
+local foodToggleTime = 0
+local foodMode = "Water"
+local idleIndex = 1
+local lastIdleTime = 0
+local lastPosBeforeAttack = nil
+local lastSniffTime = 0
+
+local idleCFrames = {
+    CFrame.new(393.017365, 571.791687, -5.18445492, 0.0557625704, 6.04802486e-10, 0.99844408, -1.52293855e-11, 1, -6.04894468e-10, -0.99844408, 1.85247807e-11, 0.0557625704),
+    CFrame.new(1997.70007, 441.18454, -680.129395, 0.507577777, 0.00243278989, -0.861602485, 7.87882968e-08, 0.999996006, 0.00282359915, 0.861605942, -0.00143326411, 0.50757575),
+    CFrame.new(2122.60938, 398.156738, 850.940125, -0.997617602, -0.0119449981, -0.0679439902, 1.93523434e-07, 0.984894812, -0.173153803, 0.0689860061, -0.172741294, -0.982548416),
+    CFrame.new(456.240112, 509.997711, 1701.30505, -0.285366416, 0.208944499, 0.93536526, -0.257968038, 0.923184574, -0.284925848, -0.923048496, -0.32260263, -0.209544867),
+    CFrame.new(-1477.31702, 360.695801, 2778.80518, -0.358562618, -8.29175042e-05, 0.933505654, 5.28495038e-05, 1, 0.000109123452, -0.933505654, 8.84629044e-05, -0.358562618),
+    CFrame.new(-1991.56909, 617.171997, 1261.29248, 0.998566926, 0.0483029932, -0.0230410732, -0.0485682711, 0.998758256, -0.0110957762, 0.0224765018, 0.0121989399, 0.999672949),
+    CFrame.new(-1666.97107, 659.591675, -1132.51355, 0.660012424, -0.723222077, -0.203306273, 0.73556149, 0.677136838, -0.0208581146, 0.152751207, -0.135777652, 0.978892982),
+    CFrame.new(-1020.27228, 388.206116, -2543.24268, 0.950728178, -0.30985716, 0.0102210632, 0.304852724, 0.94035393, 0.150994495, -0.0563981421, -0.140438795, 0.98848176),
+    CFrame.new(-681.817078, 75.0634308, -3028.96777, -0.980617046, 0.0334055759, -0.193065256, 0.0298160873, 0.999324799, 0.0214686729, 0.193652064, 0.0152960978, -0.980951071)
+}
+
+
+local function getClosestPart(parentFolder, modelName, partName)
+    local closest = nil
+    local dist = math.huge
+    local myRoot = getMyChar() and getMyChar():FindFirstChild("HumanoidRootPart")
+    if not myRoot then return nil end
+    for _, model in pairs(parentFolder:GetChildren()) do
+        if model.Name == modelName then
+            local p = model:FindFirstChild(partName)
+            if p and p:IsA("BasePart") then
+                local d = (myRoot.Position - p.Position).Magnitude
+                if d < dist then
+                    dist = d
+                    closest = p
+                end
+            end
+        end
+    end
+    return closest
+end
+
+local function getClosest(folder, name)
+    local closest = nil
+    local dist = math.huge
+    local myRoot = getMyChar() and getMyChar():FindFirstChild("HumanoidRootPart")
+    if not myRoot then return nil end
+    for _, v in pairs(folder:GetDescendants()) do
+        if v.Name == name and v:IsA("BasePart") then
+            local d = (myRoot.Position - v.Position).Magnitude
+            if d < dist then
+                dist = d
+                closest = v
+            end
+        end
+    end
+    return closest
+end
+
+task.spawn(function()
+    while true do
+        task.wait(0.2) 
+        if not _G.AutoFarm then 
+            currentTask = nil
+            hasTeleported = false
+            continue 
+        end
+        pcall(function()
+            local myRoot = getMyChar():FindFirstChild("HumanoidRootPart")
+            if not myRoot then return end
+                    -- Auto Sniff ทุก 15 วิ
+if tick() - lastSniffTime >= 15 then
+    pressKey(Enum.KeyCode.H)
+    lastSniffTime = tick()
+end
+
+            local hud = LocalPlayer.PlayerGui.HUDGui.MissionsFrame.Other
+            local qMud = hud:FindFirstChild("ConcealScent")
+            local qDrink = hud:FindFirstChild("EatFoodDrinkWater")
+            local qSniff = hud:FindFirstChild("Sniff")
+            local qAttack = hud:FindFirstChild("AttackOrHealCreatureOrNPC")
+            
+            if currentTask == "Mud" and (not qMud or not qMud.Visible) then currentTask = nil end
+            if currentTask == "Drink" and (not qDrink or not qDrink.Visible) then currentTask = nil end
+            if currentTask == "Sniff" and (not qSniff or not qSniff.Visible) then currentTask = nil end
+            
+            if currentTask == "Attack" and (not qAttack or not qAttack.Visible) then 
+                if lastPosBeforeAttack then
+                    myRoot.CFrame = lastPosBeforeAttack
+                    lastPosBeforeAttack = nil
+                end
+                currentTask = nil 
+            end
+            
+            if currentTask == nil then
+                local taskPool = {}
+                if qMud and qMud.Visible then table.insert(taskPool, "Mud") end
+                if qDrink and qDrink.Visible then table.insert(taskPool, "Drink") end
+                if qSniff and qSniff.Visible then table.insert(taskPool, "Sniff") end
+                if qAttack and qAttack.Visible then table.insert(taskPool, "Attack") end
+                
+                if #taskPool > 0 then
+                    currentTask = taskPool[math.random(1, #taskPool)]
+                    hasTeleported = false 
+                    foodToggleTime = tick()
+                    foodMode = "Water"
+                    if currentTask == "Attack" then
+                        lastPosBeforeAttack = myRoot.CFrame
+                    end
+                else
+                    if myRoot and tick() - lastIdleTime >= 5 then
+                        myRoot.CFrame = idleCFrames[idleIndex]
+                        idleIndex = (idleIndex % #idleCFrames) + 1
+                        lastIdleTime = tick()
+                    end
+                end
+            end
+            
+            if currentTask == "Mud" then
+                local target = getClosest(Workspace.Interactions.Mud, "Mud")
+                if target then
+                    if not hasTeleported then
+                        myRoot.CFrame = target.CFrame * CFrame.new(0, 40, 0)
+                        hasTeleported = true
+                    end
+                    pressKey(Enum.KeyCode.E)
+                            task.wait(1)
+                end
+            elseif currentTask == "Drink" then
+                if tick() - foodToggleTime >= 10 then
+                    foodToggleTime = tick()
+                    foodMode = (foodMode == "Water") and "Food" or "Water"
+                    hasTeleported = false
+                end
+                if foodMode == "Water" then
+                    local target = getClosest(Workspace.Interactions.Lakes, "SurfaceMask")
+                    if target then
+                        if not hasTeleported then
+                            myRoot.CFrame = target.CFrame * CFrame.new(0, 0.5, 0)
+                            hasTeleported = true
+                        end
+                        pressKey(Enum.KeyCode.E)
+                    end
+                else
+                    local target = getClosestPart(Workspace.Interactions.Food, "Ribs", "Food")
+                    if target then
+                        if not hasTeleported then
+                           local lookPos = target.Position
+local direction = (lookPos - myRoot.Position).Unit
+local telePos = lookPos - (direction * 7) + Vector3.new(0,3,0)
+
+myRoot.CFrame = CFrame.lookAt(telePos, lookPos)
+Camera.CFrame = CFrame.lookAt(Camera.CFrame.Position, lookPos)
+                            hasTeleported = true
+                        end
+                        pressKey(Enum.KeyCode.E)
+                    end
+                end
+            elseif currentTask == "Sniff" then
+                        if tick() - lastSniffTime >= 15 then
+                pressKey(Enum.KeyCode.H)
+                            lastSniffTime = tick()
+    end
+            elseif currentTask == "Attack" then
+                local chars = Workspace.Characters:GetChildren()
+                local enemy = nil
+                if #chars > 1 then
+                    for i = 1, 10 do 
+                        local temp = chars[math.random(1, #chars)]
+                        if temp ~= getMyChar() and temp:FindFirstChild("HumanoidRootPart") then
+                            enemy = temp
+                            break
+                        end
+                    end
+                end
+                if enemy then
+                    myRoot.CFrame = enemy.HumanoidRootPart.CFrame * CFrame.new(0, 0, 2)
+                    clickMouse()
+                end
+            end
+        end)
+    end
+end)
 
 MainTab:Button({
 Title = "Copy Position",
@@ -251,7 +609,77 @@ char.HumanoidRootPart.CFrame = CFrame.new(-1626.9925537109375,240.81964111328125
 end
 end
 })
+MainTab:Section({
+    Title = "// Token"
+})
 
+local function getTokens()
+    local tokens = {}
+    
+    for _,v in pairs(workspace:GetDescendants()) do
+        if string.find(v.Name:lower(),"token") and v:IsA("BasePart") then
+            table.insert(tokens,v)
+        end
+    end
+    
+    return tokens
+end
+
+
+MainTab:Button({
+    Title = "Teleport All Tokens",
+    Desc = "วาปไปเก็บ Token ทุกอันในแมพ",
+    Callback = function()
+        
+        local char = game.Players.LocalPlayer.Character
+        if not char then return end
+        
+        local root = char:FindFirstChild("HumanoidRootPart")
+        if not root then return end
+        
+        local tokens = getTokens()
+        
+        for _,token in pairs(tokens) do
+            if token and token.Parent then
+                root.CFrame = token.CFrame + Vector3.new(0,5,0)
+                task.wait(0.6)
+            end
+        end
+        
+        print("Collected all tokens")
+    end
+})
+
+local AutoFarmToggle = MainTab:Toggle({
+    Title = "Auto Farm ",
+    Desc = "ฟาร์มโหดๆ555 ",
+    Default = false,
+    Callback = function(Value)
+        _G.AutoFarm = Value
+        if not Value then 
+            currentTask = nil 
+            hasTeleported = false 
+            lastPosBeforeAttack = nil
+        end
+    end
+})
+local SelectedPlayer = nil
+
+MainTab:Dropdown({
+    Title = "Select Player",
+    Values = (function()
+        local t = {}
+        for _,v in pairs(game.Players:GetPlayers()) do
+            if v ~= game.Players.LocalPlayer then
+                table.insert(t,v.Name)
+            end
+        end
+        return t
+    end)(),
+    Callback = function(v)
+        SelectedPlayer = v
+    end
+})
 
 MainTab:Toggle({
     Title = "Hitbox",
@@ -278,12 +706,13 @@ MainTab:Toggle({
         _G.SpeedHack = Value
     end
 })
+_G.HitboxPlayer = ""
 
 MainTab:Input({
-    Title = "Hitbox Target",
-    Placeholder = "พิมพ์ชื่อผู้เล่น",
+    Title = "Hitbox Player",
+    Desc = "พิมพ์ชื่อผู้เล่น",
+    Placeholder = "Player Name",
     Callback = function(text)
-        HitboxPlayer = text
+        _G.HitboxPlayer = text
     end
 })
-
