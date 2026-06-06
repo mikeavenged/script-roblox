@@ -1,10 +1,3 @@
-local lakesFolder = workspace.Interactions.Lakes
-for _, object in pairs(lakesFolder:GetDescendants()) do
-    if object:IsA("BasePart") then
-        object.CanCollide = true
-    end
-end
-
 
 -- ================== Windows  ================== --
 local WindUI = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"))()
@@ -39,11 +32,6 @@ Window:SetToggleKey(Enum.KeyCode.X)
 
 
 
--- ================== ConfigFile  ================== --
-local ConfigManager = Window.ConfigManager
-local MyConfig = ConfigManager:CreateConfig("DefaultConfig")
--- ================== ConfigFile  ================== --
-
 
 
 
@@ -55,15 +43,11 @@ local MainTab = Window:Tab({
     Locked = false,
 })
 
--- ================== Tab  ================== --
-
-
 
 MainTab:Section({
     Title = "// Main "
 })
 
-local VirtualInputManager = game:GetService("VirtualInputManager")
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 local Workspace = game:GetService("Workspace")
@@ -85,43 +69,13 @@ local function FindPlayerByText(text)
 
     return nil
 end
-local HitboxDropdown
-local function GetPlayerList()
-    local t = {}
-    for _,plr in ipairs(game.Players:GetPlayers()) do
-        if plr ~= game.Players.LocalPlayer then
-            table.insert(t, plr.Name)
-        end
-    end
-    table.sort(t)
-    return t
-end
+
 
 _G.Hitbox = false
 _G.PlayerESP = false
-_G.FastHunger = false
-_G.AutoShoom = false
 _G.SpeedHack = false
-_G.AntiBoneBreak = false
 _G.SpeedValue = 5 -- ปรับความแรง (แนะนำ 3 - 10)
-_G.UnlimitedBreath = false
--- ================== Ultimate Fix Logic ================== --
 
--- 3. ระบบ Bypass Movement (สำหรับกระดูกแตกแล้วเดินไม่ออก)
-task.spawn(function()
-    while task.wait(0.5) do
-        if _G.AntiBoneBreak then
-            pcall(function()
-                local hum = game.Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
-                if hum then
-                    hum.WalkSpeed = 16 -- บังคับความเร็วเดินพื้นฐานตลอดเวลา
-                    hum.JumpPower = 50 -- บังคับการกระโดด
-                end
-            end)
-        end
-    end
-end)
-local UIS = game:GetService("UserInputService")
 
 
 local function createESP(player)
@@ -192,12 +146,13 @@ task.spawn(function()
                 continue
             end
 
-            if targetPlayer
-                and targetPlayer.Character
-                and char == targetPlayer.Character
-                and _G.Hitbox then
+          if targetPlayer
+and targetPlayer ~= LocalPlayer
+and targetPlayer.Character
+and char == targetPlayer.Character
+and _G.Hitbox then
 
-                root.Size = Vector3.new(100,300,100)
+                root.Size = Vector3.new(100,200,100)
                 root.Transparency = 0.6
                 root.CanCollide = false
                 root.Massless = true
@@ -296,46 +251,7 @@ char.HumanoidRootPart.CFrame = CFrame.new(-1626.9925537109375,240.81964111328125
 end
 end
 })
-MainTab:Section({
-    Title = "// Token"
-})
 
-local function getTokens()
-    local tokens = {}
-    
-    for _,v in pairs(workspace:GetDescendants()) do
-        if string.find(v.Name:lower(),"token") and v:IsA("BasePart") then
-            table.insert(tokens,v)
-        end
-    end
-    
-    return tokens
-end
-
-
-MainTab:Button({
-    Title = "Teleport All Tokens",
-    Desc = "วาปไปเก็บ Token ทุกอันในแมพ",
-    Callback = function()
-        
-        local char = game.Players.LocalPlayer.Character
-        if not char then return end
-        
-        local root = char:FindFirstChild("HumanoidRootPart")
-        if not root then return end
-        
-        local tokens = getTokens()
-        
-        for _,token in pairs(tokens) do
-            if token and token.Parent then
-                root.CFrame = token.CFrame + Vector3.new(0,5,0)
-                task.wait(0.6)
-            end
-        end
-        
-        print("Collected all tokens")
-    end
-})
 
 MainTab:Toggle({
     Title = "Hitbox",
