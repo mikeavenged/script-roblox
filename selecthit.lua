@@ -68,7 +68,6 @@ local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 local Workspace = game:GetService("Workspace")
 local Camera = Workspace.CurrentCamera
-local AttackRemote = game.ReplicatedStorage:FindFirstChild("Attack")
 local HitboxPlayer = nil
 local HitboxDropdown
 local function GetPlayerList()
@@ -82,8 +81,6 @@ local function GetPlayerList()
     return t
 end
 
-
-_G.RemoteAttack = false
 _G.Hitbox = false
 _G.PlayerESP = false
 _G.FastHunger = false
@@ -168,38 +165,7 @@ end)
 
 
 task.spawn(function()
-    while task.wait(0.1) do
-        
-        if not _G.RemoteAttack then
-            continue
-        end
-        
-        if AttackRemote then
-            for _,v in pairs(Players:GetPlayers()) do
-                if v ~= LocalPlayer then
-                    
-                    local char = v.Character
-                    if char and char:FindFirstChild("HumanoidRootPart") then
-                        AttackRemote:FireServer(
-                            char,
-                            char.HumanoidRootPart.Position
-                        )
-                    end
-                    
-                end
-            end
-        end
-        
-    end
-end)
-
-local function getMyChar()
-    return Workspace.Characters:FindFirstChild(LocalPlayer.Name) or LocalPlayer.Character
-end
-
-
-task.spawn(function()
-    while task.wait(0.2) do
+    while task.wait(0.5) do
 
         for _,char in pairs(Workspace.Characters:GetChildren()) do
 
@@ -209,7 +175,7 @@ task.spawn(function()
             if HitboxPlayer and char.Name == HitboxPlayer then
 
                 if _G.Hitbox then
-                    root.Size = Vector3.new(50,200,50)
+                    root.Size = Vector3.new(100,300,100)
                     root.Transparency = 0.6
                     root.CanCollide = false
                     root.Massless = true
