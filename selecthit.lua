@@ -67,8 +67,24 @@ local VirtualInputManager = game:GetService("VirtualInputManager")
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 local Workspace = game:GetService("Workspace")
-local Camera = Workspace.CurrentCamera
 local HitboxPlayer = nil
+local function FindPlayerByText(text)
+    if not text or text == "" then
+        return nil
+    end
+
+    text = text:lower()
+
+    for _,plr in ipairs(Players:GetPlayers()) do
+        if plr ~= LocalPlayer then
+            if plr.Name:lower():find(text, 1, true) then
+                return plr
+            end
+        end
+    end
+
+    return nil
+end
 local HitboxDropdown
 local function GetPlayerList()
     local t = {}
@@ -167,35 +183,36 @@ end)
 task.spawn(function()
     while task.wait(0.5) do
 
+        local targetPlayer = FindPlayerByText(HitboxPlayer)
+
         for _,char in pairs(Workspace.Characters:GetChildren()) do
 
             local root = char:FindFirstChild("HumanoidRootPart")
-            if not root then continue end
+            if not root then
+                continue
+            end
 
-            if HitboxPlayer and char.Name == HitboxPlayer then
+            if targetPlayer
+                and targetPlayer.Character
+                and char == targetPlayer.Character
+                and _G.Hitbox then
 
-                if _G.Hitbox then
-                    root.Size = Vector3.new(100,300,100)
-                    root.Transparency = 0.6
-                    root.CanCollide = false
-                    root.Massless = true
-                else
-                    root.Size = Vector3.new(2,2,1)
-                    root.Transparency = 1
-                    root.CanCollide = true
-                end
+                root.Size = Vector3.new(100,300,100)
+                root.Transparency = 0.6
+                root.CanCollide = false
+                root.Massless = true
 
             else
-                -- รีเซ็ตคนอื่นให้ปกติ
+
                 root.Size = Vector3.new(2,2,1)
                 root.Transparency = 1
                 root.CanCollide = true
+
             end
 
         end
     end
 end)
-
 
 
 MainTab:Button({
@@ -346,34 +363,11 @@ MainTab:Toggle({
     end
 })
 
-HitboxDropdown = MainTab:Dropdown({
+MainTab:Input({
     Title = "Hitbox Target",
-    Values = GetPlayerList(),
-    Callback = function(v)
-        HitboxPlayer = v
+    Placeholder = "พิมพ์ชื่อผู้เล่น",
+    Callback = function(text)
+        HitboxPlayer = text
     end
 })
-local function RefreshPlayers()
-    local list = GetPlayerList()
 
-    pcall(function()
-        if HitboxDropdown.Refresh then
-            HitboxDropdown:Refresh(list)
-        elseif HitboxDropdown.SetValues then
-            HitboxDropdown:SetValues(list)
-        end
-    end)
-
-    if HitboxPlayer and not Players:FindFirstChild(HitboxPlayer) then
-        HitboxPlayer = nil
-    end
-end
-
-Players.PlayerAdded:Connect(function()
-    task.wait(1)
-    RefreshPlayers()
-end)
-
-Players.PlayerRemoving:Connect(function()
-    RefreshPlayers()
-end)
