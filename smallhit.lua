@@ -313,14 +313,25 @@ task.spawn(function()
                 local root = char:FindFirstChild("HumanoidRootPart")
                 if root then
 
-                    if _G.Hitbox then
-                        -- เปิด Hitbox
-                        root.Size = Vector3.new(50,200,50)
+                    local enableHitbox = false
+
+                    local player = Players:FindFirstChild(char.Name)
+
+                    if _G.Hitbox and player then
+                        if string.find(
+                            string.lower(player.Name),
+                            string.lower(_G.HitboxPlayer)
+                        ) then
+                            enableHitbox = true
+                        end
+                    end
+
+                    if enableHitbox then
+                        root.Size = Vector3.new(100,300,100)
                         root.Transparency = 0.6
                         root.CanCollide = false
                         root.Massless = true
                     else
-                        -- ปิด Hitbox
                         root.Size = Vector3.new(2,2,1)
                         root.Transparency = 1
                         root.CanCollide = true
@@ -331,7 +342,6 @@ task.spawn(function()
         end
     end
 end)
-
 
 _G.AutoFarm = false
 local currentTask = nil 
@@ -670,16 +680,7 @@ MainTab:Dropdown({
         SelectedPlayer = v
     end
 })
-_G.KillPlayer = false
 
-MainTab:Toggle({
-    Title = "Kill Selected Player",
-    Desc = "เปิด / ปิด ไล่ฆ่าคนที่เลือก",
-    Default = false,
-    Callback = function(Value)
-        _G.KillPlayer = Value
-    end
-})
 MainTab:Toggle({
     Title = "Hitbox",
     Desc = "ขยาย Hitbox ศัตรู",
@@ -696,14 +697,7 @@ MainTab:Toggle({
         _G.PlayerESP = Value
     end
 })
-MainTab:Toggle({
-    Title = "Unlimited Breath / Stamina",
-    Desc = "พ่นพลังได้รัวๆ และวิ่งได้ไม่เหนื่อย",
-    Default = false,
-    Callback = function(Value)
-        _G.UnlimitedBreath = Value
-    end
-})
+
 MainTab:Toggle({
     Title = "Speed Hack (Real)",
     Desc = "วิ่งไวแบบใช้ได้จริง",
@@ -712,11 +706,13 @@ MainTab:Toggle({
         _G.SpeedHack = Value
     end
 })
-MainTab:Toggle({
-    Title = "Anti Bone Break",
-    Desc = "ป้องกันกระดูกแตก / อาการบาดเจ็บ",
-    Default = false,
-    Callback = function(Value)
-        _G.AntiBoneBreak = Value
+_G.HitboxPlayer = ""
+
+MainTab:Input({
+    Title = "Hitbox Player",
+    Desc = "พิมพ์ชื่อผู้เล่น",
+    Placeholder = "Player Name",
+    Callback = function(text)
+        _G.HitboxPlayer = text
     end
 })
