@@ -1,10 +1,3 @@
-local lakesFolder = workspace.Interactions.Lakes
-for _, object in pairs(lakesFolder:GetDescendants()) do
-    if object:IsA("BasePart") then
-        object.CanCollide = true
-    end
-end
-
 
 -- ================== Windows  ================== --
 local WindUI = loadstring(game:HttpGet("https://github.com/Footagesus/WindUI/releases/latest/download/main.lua"))()
