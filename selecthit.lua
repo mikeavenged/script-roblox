@@ -265,7 +265,7 @@ task.spawn(function()
                         end
 
                         if enableHitbox then
-                            root.Size = Vector3.new(100, 300, 100)
+                            root.Size = Vector3.new(300, 300, 300)
                             root.Transparency = 0.6
                             root.CanCollide = false
                             root.Massless = true
