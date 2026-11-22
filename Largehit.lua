@@ -72,7 +72,7 @@ _G.FastHunger = false
 _G.AutoShoom = false
 _G.SpeedHack = false
 _G.AntiBoneBreak = false
-_G.SpeedValue = 5 -- ปรับความแรง (แนะนำ 3 - 10)
+_G.SpeedValue = 10 -- ปรับความแรง (แนะนำ 3 - 10)
 _G.UnlimitedBreath = false
 -- ================== Ultimate Fix Logic ================== --
 task.spawn(function()
